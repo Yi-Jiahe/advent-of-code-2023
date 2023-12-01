@@ -39,6 +39,7 @@ pub fn get_sum_of_calibration_values_in_document(document: &str) -> i32 {
 ///
 /// * `line` a line from the newly-improved calibration document
 pub fn get_calibration_value_part_2(line: &str) -> usize {
+    // Parse digits first, taking note of when they occur
     let (mut first_digit_position, mut first_digit): (Option<usize>, Option<char>) = (None, None);
     let (mut last_digit_position, mut last_digit): (Option<usize>, Option<char>) = (None, None);
     for (i, c) in line.chars().enumerate() { 
@@ -64,18 +65,27 @@ pub fn get_calibration_value_part_2(line: &str) -> usize {
         ("nine", '9')
     ]);
 
+    // Look for word in line
+    // If not present, continue to next word
+    // If present, check if the first digit has been found yet or occurs after it
+    // If so, it is the new first digit
+    // Look for word from the right, same logic
     for (letters, digit) in &letters_digits {
         let position = line.find(letters);
-        if !position.is_none() {
-            if first_digit_position.is_none() || position < first_digit_position {
-                first_digit_position = position;
-                first_digit = Some(*digit);
-            }
-            if first_digit_position.is_none() || position > last_digit_position {
-                last_digit_position = position;
-                last_digit = Some(*digit);
-            }
+        if position.is_none() {
+            continue;
         }
+        if first_digit_position.is_none() || (position.unwrap() < first_digit_position.unwrap()) {
+            first_digit_position = position;
+            first_digit = Some(*digit);
+        }
+
+        let r_position = line.rfind(letters);
+        if last_digit_position.is_none() || r_position > last_digit_position {
+            last_digit_position = r_position;
+            last_digit = Some(*digit);
+        }
+
     }
 
     format!("{}{}", first_digit.unwrap(), last_digit.unwrap()).parse::<usize>().unwrap()

@@ -49,6 +49,16 @@ mod day_1_tests {
         test_get_calibration_value_part_2_4nineeightseven2: ("4nineeightseven2", 42),
         test_get_calibration_value_part_2_zoneight234: ("zoneight234", 14),
         test_get_calibration_value_part_2_7pqrstsixteen: ("7pqrstsixteen", 76),
+        // Shared characters
+        test_get_calibration_value_part_2_eighthree: ("eighthree", 83),
+        test_get_calibration_value_part_2_sevenine: ("sevenine", 79),
+        // Word right after first digit
+        test_get_calibration_value_part_2_1nine: ("1nine", 19),
+        // Only one word
+        test_get_calibration_value_part_2_seven: ("seven", 77),
+        // Repeated word on right
+        test_get_calibration_value_part_2_one3one: ("one3one", 11),
+
     }
 
     #[test]
