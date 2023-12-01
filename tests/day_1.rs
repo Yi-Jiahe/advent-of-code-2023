@@ -50,4 +50,15 @@ mod day_1_tests {
         test_get_calibration_value_part_2_zoneight234: ("zoneight234", 14),
         test_get_calibration_value_part_2_7pqrstsixteen: ("7pqrstsixteen", 76),
     }
+
+    #[test]
+    fn test_get_sum_of_calibration_values_in_document_part_2() {
+        assert_eq!(281, day_1::get_sum_of_calibration_values_in_document_part_2(r#"two1nine
+        eightwothree
+        abcone2threexyz
+        xtwone3four
+        4nineeightseven2
+        zoneight234
+        7pqrstsixteen"#));
+    }
 }

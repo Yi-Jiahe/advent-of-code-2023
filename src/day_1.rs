@@ -80,3 +80,16 @@ pub fn get_calibration_value_part_2(line: &str) -> usize {
 
     format!("{}{}", first_digit.unwrap(), last_digit.unwrap()).parse::<usize>().unwrap()
 }
+
+/// Returns a the sum of calibration values in a valid newly-improved calibration document based on part 2
+///
+/// # Arguments
+///
+/// * `document` a valid newly-improved calibration document
+pub fn get_sum_of_calibration_values_in_document_part_2(document: &str) -> usize {
+    let mut ans = 0;
+    for line in document.split("\n") {
+        ans = ans + get_calibration_value_part_2(line)
+    }
+    ans
+}
