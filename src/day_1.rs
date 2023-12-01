@@ -17,3 +17,7 @@ pub fn get_calibration_value(line: &str) -> i32 {
 
     format!("{}{}", first_digit.unwrap(), last_digit.unwrap()).parse::<i32>().unwrap()
 }
+
+pub fn get_sum_of_calibration_values_in_document(document: &str) -> i32 {
+    0
+}
