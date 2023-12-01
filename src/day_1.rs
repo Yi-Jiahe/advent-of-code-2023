@@ -18,6 +18,15 @@ pub fn get_calibration_value(line: &str) -> i32 {
     format!("{}{}", first_digit.unwrap(), last_digit.unwrap()).parse::<i32>().unwrap()
 }
 
+/// Returns a the sum of calibration values in a valid newly-improved calibration document
+///
+/// # Arguments
+///
+/// * `document` a valid newly-improved calibration document
 pub fn get_sum_of_calibration_values_in_document(document: &str) -> i32 {
-    0
+    let mut ans = 0;
+    for line in document.split("\n") {
+        ans = ans + get_calibration_value(line)
+    }
+    ans
 }
