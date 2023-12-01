@@ -30,3 +30,12 @@ pub fn get_sum_of_calibration_values_in_document(document: &str) -> i32 {
     }
     ans
 }
+
+/// Returns a 2 digit integer given a string containing at least one digit or digit spelt out with letters 
+///
+/// # Arguments
+///
+/// * `line` a line from the newly-improved calibration document
+pub fn get_calibration_value_part_2(line: &str) -> i32 {
+    0
+}

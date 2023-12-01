@@ -28,4 +28,26 @@ mod day_1_tests {
         a1b2c3d4e5f
         treb7uchet"#));
     }
+
+    macro_rules! generate_parse_calibration_value_part_2_tests {
+        ($($name:ident: $value:expr,)*) => {
+        $(
+            #[test]
+            fn $name() {
+                let (input, expected) = $value;
+                assert_eq!(expected, day_1::get_calibration_value_part_2(input));
+            }
+        )*
+        }
+    }
+    
+    generate_parse_calibration_value_part_2_tests! {
+        test_get_calibration_value_part_2_two1nine: ("two1nine", 29),
+        test_get_calibration_value_part_2_pqr3stu8vwx: ("eightwothree", 83),
+        test_get_calibration_value_part_2_abcone2threexyz: ("abcone2threexyz", 13),
+        test_get_calibration_value_part_2_xtwone3four: ("xtwone3four", 24),
+        test_get_calibration_value_part_2_4nineeightseven2: ("4nineeightseven2", 42),
+        test_get_calibration_value_part_2_zoneight234: ("zoneight234", 14),
+        test_get_calibration_value_part_2_7pqrstsixteen: ("7pqrstsixteen", 76),
+    }
 }
