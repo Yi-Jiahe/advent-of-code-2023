@@ -13,7 +13,7 @@ mod day_1_tests {
             #[test]
             fn $name() {
                 let (input, expected) = $value;
-                assert_eq!(expected, day_1::get_calibartion_value(input));
+                assert_eq!(expected, day_1::get_calibration_value(input));
             }
         )*
         }
