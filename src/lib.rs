@@ -1,5 +1,5 @@
-mod utils;
 pub mod day_1;
+mod utils;
 
 use wasm_bindgen::prelude::*;
 
