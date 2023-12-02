@@ -34,6 +34,27 @@ fn game_is_valid(game: &str, dice_loaded :&[usize]) -> (usize, bool) {
     (id, true)
 }
 
+/// Determines the sum of valid game ids given information about each game
+/// The bag was loaded with only 12 red cubes, 13 green cubes, and 14 blue cubes
+/// # Arguments
+///
+/// * `games` String containing information about each game
+///
+/// # Returns
+/// Sum of possible game ids
+pub fn day_2_get_sum_of_possible_game_ids(games: &str) -> usize {
+    let mut ans = 0;
+
+    let loaded_dice = [12, 13, 14];
+    for game in games.split("\n") {
+        let (id, valid) = game_is_valid(game.trim(), &loaded_dice);
+        if valid {
+            ans = ans + id;
+        }
+    }
+    ans
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
