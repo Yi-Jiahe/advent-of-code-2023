@@ -1,3 +1,5 @@
+use wasm_bindgen::prelude::*;
+
 use regex::Regex;
 
 /// Determines if game is valid given the game and the dice loaded into the bag
@@ -42,6 +44,7 @@ fn game_is_valid(game: &str, dice_loaded :&[usize]) -> (usize, bool) {
 ///
 /// # Returns
 /// Sum of possible game ids
+#[wasm_bindgen]
 pub fn day_2_get_sum_of_possible_game_ids(games: &str) -> usize {
     let mut ans = 0;
 
@@ -94,6 +97,7 @@ fn minimum_power(game: &str) -> usize {
 ///
 /// # Returns
 /// Sum of the power of minimum set of cubes that must have been present for each game
+#[wasm_bindgen]
 pub fn day_2_get_sum_of_minimum_power(games: &str) -> usize {
     let mut ans = 0;
 

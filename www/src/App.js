@@ -1,6 +1,9 @@
 import './App.css';
 import { useState } from 'react';
-import init, { day_1_get_sum_of_calibration_values_in_document, day_1_get_sum_of_calibration_values_in_document_part_2 } from "advent-of-code-2023";
+import init, { 
+  day_1_get_sum_of_calibration_values_in_document, day_1_get_sum_of_calibration_values_in_document_part_2,
+  day_2_get_sum_of_possible_game_ids, day_2_get_sum_of_minimum_power
+} from "advent-of-code-2023";
 
 function App() {
   const [answer, setAnswer] = useState();
@@ -22,7 +25,7 @@ function App() {
             init().then(() => {
               try {
                 const puzzle_input = document.getElementById('puzzle-input').value;
-                setAnswer(day_1_get_sum_of_calibration_values_in_document(puzzle_input));
+                setAnswer(day_2_get_sum_of_possible_game_ids(puzzle_input));
               } catch {
                 raiseError();
               }
@@ -33,7 +36,7 @@ function App() {
             init().then(() => {
               try {
                 const puzzle_input = document.getElementById('puzzle-input').value;
-                setAnswer(day_1_get_sum_of_calibration_values_in_document_part_2(puzzle_input));
+                setAnswer(day_2_get_sum_of_minimum_power(puzzle_input));
               } catch {
                 raiseError();
               }
