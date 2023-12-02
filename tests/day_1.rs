@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod day_1_tests {
-    use advent_of_code_2023::day_1::{
+    use aoc_restore_snow_operations::day_1::{
         day_1_get_sum_of_calibration_values_in_document,
         day_1_get_sum_of_calibration_values_in_document_part_2,
     };
