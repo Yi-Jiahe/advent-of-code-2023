@@ -1,8 +1,7 @@
 #[cfg(test)]
 mod day_2_tests {
     use aoc_restore_snow_operations::day_2::{
-        day_2_get_sum_of_possible_game_ids,
-        day_2_get_sum_of_minimum_power
+        day_2_get_sum_of_minimum_power, day_2_get_sum_of_possible_game_ids,
     };
 
     #[test]

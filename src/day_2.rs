@@ -10,7 +10,7 @@ use regex::Regex;
 ///
 /// # Returns
 /// Array containing the game ID and if the game is valid
-fn game_is_valid(game: &str, dice_loaded :&[usize]) -> (usize, bool) {
+fn game_is_valid(game: &str, dice_loaded: &[usize]) -> (usize, bool) {
     let game_re = Regex::new(r"^Game (\d+): (.*)$").unwrap();
     let caps = game_re.captures(game).unwrap();
 
@@ -25,10 +25,18 @@ fn game_is_valid(game: &str, dice_loaded :&[usize]) -> (usize, bool) {
     for set in sets {
         for (i, re) in cube_res.iter().enumerate() {
             let caps = re.captures(set);
-            if caps.is_none() { continue; }
-            let n = caps.unwrap().get(1).unwrap().as_str().parse::<usize>().unwrap();
+            if caps.is_none() {
+                continue;
+            }
+            let n = caps
+                .unwrap()
+                .get(1)
+                .unwrap()
+                .as_str()
+                .parse::<usize>()
+                .unwrap();
             if n > dice_loaded[i] {
-                return (id, false)
+                return (id, false);
             }
         }
     }
@@ -79,8 +87,16 @@ fn minimum_power(game: &str) -> usize {
     for set in sets {
         for (i, re) in cube_res.iter().enumerate() {
             let caps = re.captures(set);
-            if caps.is_none() { continue; }
-            let n = caps.unwrap().get(1).unwrap().as_str().parse::<usize>().unwrap();
+            if caps.is_none() {
+                continue;
+            }
+            let n = caps
+                .unwrap()
+                .get(1)
+                .unwrap()
+                .as_str()
+                .parse::<usize>()
+                .unwrap();
             if n > min_cubes[i] {
                 min_cubes[i] = n
             }
