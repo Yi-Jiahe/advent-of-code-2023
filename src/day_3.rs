@@ -29,55 +29,28 @@ pub fn day_3_get_sum_of_part_numbers(schematic: &str) -> usize {
                     let l = if s >= 1 { s - 1 } else { s };
                     let r = if e < m - 1 { e+1 } else { e };
        
-                    dbg!(&s, &e, &number);
-                    dbg!(&u, &d, &l, &r);
-                    // let include = 'block: {
-                    //     for y in u..d {
-                    //         dbg!(&y);
-                    //         if y == i {
-                    //             for x in [l, r] {
-                    //                 let c = indexable_schematic[y][x];
-                    //                 if !c.is_digit(10) && c != '.' {
-                    //                     break 'block true;
-                    //                 }
-                    //             }
-                    //         } else {
-                    //             for x in l..=r {
-                    //                 let c = indexable_schematic[y][x];
-                    //                 if !c.is_digit(10) && c != '.' {
-                    //                     break 'block true;
-                    //                 }
-                    //             }
-                    //         }
-                    //     }
-                    //     false
-                    // };
-
-                    let mut include = false;
-                    for y in u..=d {
-                        dbg!(&y);
-                        if y == i {
-                            for x in [l, r] {
-                                let c = indexable_schematic[y][x];
-                                if !c.is_digit(10) && c != '.' {
-                                    include = true;
-                                    break;
+                    let include = 'block: {
+                        for y in u..=d {
+                            dbg!(&y);
+                            if y == i {
+                                for x in [l, r] {
+                                    let c = indexable_schematic[y][x];
+                                    if !c.is_digit(10) && c != '.' {
+                                        break 'block true;
+                                    }
                                 }
-                                if include { break; }
-                            }
-                        } else {
-                            for x in l..=r {
-                                let c = indexable_schematic[y][x];
-                                if !c.is_digit(10) && c != '.' {
-                                    include = true;
-                                    break;
+                            } else {
+                                for x in l..=r {
+                                    let c = indexable_schematic[y][x];
+                                    if !c.is_digit(10) && c != '.' {
+                                        break 'block true;
+                                    }
                                 }
-                                if include { break; }
                             }
                         }
-                    }
-        
-                    dbg!(&include);
+                        false
+                    };
+                  
                     if include { ans = ans + number; }
 
                     number_str = "".to_string();
