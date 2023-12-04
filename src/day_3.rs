@@ -67,7 +67,6 @@ pub fn day_3_get_sum_of_part_numbers(schematic: &str) -> usize {
 
 #[derive(Debug)]
 struct Part {
-    row: usize,
     start: usize,
     end: usize,
     number: usize,
@@ -91,7 +90,6 @@ fn extract_parts(schematic: &str) -> HashMap<usize, Vec<Part>> {
 
                 if (j == m - 1) || !chars[j + 1].is_digit(10) {
                     parts_on_line.push(Part {
-                        row: i,
                         start: s,
                         end: j,
                         number: number_str.parse::<usize>().unwrap(),
@@ -114,7 +112,6 @@ pub fn day_3_get_sum_of_gear_ratios(schematic: &str) -> usize {
     let parts = extract_parts(schematic);
 
     for (i, line) in schematic.split("\n").map(|line| line.trim()).enumerate() {
-        let m = line.len();
         for (j, c) in line.chars().enumerate() {
             if c == '*' {
                 let mut adjacent_parts = HashSet::new();
