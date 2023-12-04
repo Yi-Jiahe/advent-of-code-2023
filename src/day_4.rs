@@ -1,3 +1,5 @@
+use wasm_bindgen::prelude::*;
+
 use std::collections::{HashMap, HashSet};
 use std::convert::TryInto;
 use std::iter::FromIterator;
@@ -15,6 +17,7 @@ fn identify_card_point_value(card: &str) -> usize {
     }
 }
 
+#[wasm_bindgen]
 pub fn day_4_total_scratchcard_points(cards: &str) -> usize {
     let mut ans = 0;
     for card in cards.split("\n").map(|line| line.trim()) {
@@ -52,6 +55,7 @@ fn get_number_of_matches(winning_numbers: HashSet<&str>, card_numbers: HashSet<&
         .len()
 }
 
+#[wasm_bindgen]
 pub fn day_4_get_final_number_of_cards(cards: &str) -> usize {
     let mut ans = 0;
 

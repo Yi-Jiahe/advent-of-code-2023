@@ -1,3 +1,5 @@
+use wasm_bindgen::prelude::*;
+
 use std::collections::{HashMap, HashSet};
 
 fn load_schematic(schematic: &str) -> Vec<Vec<char>> {
@@ -7,6 +9,7 @@ fn load_schematic(schematic: &str) -> Vec<Vec<char>> {
         .collect()
 }
 
+#[wasm_bindgen]
 pub fn day_3_get_sum_of_part_numbers(schematic: &str) -> usize {
     let mut ans = 0;
     let indexable_schematic = load_schematic(schematic);
@@ -106,6 +109,7 @@ fn extract_parts(schematic: &str) -> HashMap<usize, Vec<Part>> {
     parts
 }
 
+#[wasm_bindgen]
 pub fn day_3_get_sum_of_gear_ratios(schematic: &str) -> usize {
     let mut ans = 0;
 
