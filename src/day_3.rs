@@ -21,16 +21,16 @@ pub fn day_3_get_sum_of_part_numbers(schematic: &str) -> usize {
                     s = j;
                 }
                 number_str = format!("{}{}", number_str, c);
-                
-                if (j == m - 1) || !indexable_schematic[i][j+1].is_digit(10) {
+
+                if (j == m - 1) || !indexable_schematic[i][j + 1].is_digit(10) {
                     let number = number_str.parse::<usize>().unwrap();
                     let e = j;
 
                     let u = if i >= 1 { i - 1 } else { i };
-                    let d = if i < n - 1 { i+1 } else { i };
+                    let d = if i < n - 1 { i + 1 } else { i };
                     let l = if s >= 1 { s - 1 } else { s };
-                    let r = if e < m - 1 { e+1 } else { e };
-       
+                    let r = if e < m - 1 { e + 1 } else { e };
+
                     let include = 'block: {
                         for y in u..=d {
                             if y == i {
@@ -51,8 +51,10 @@ pub fn day_3_get_sum_of_part_numbers(schematic: &str) -> usize {
                         }
                         false
                     };
-                  
-                    if include { ans = ans + number; }
+
+                    if include {
+                        ans = ans + number;
+                    }
 
                     number_str = "".to_string();
                 }
@@ -86,8 +88,8 @@ fn extract_parts(schematic: &str) -> HashMap<usize, Vec<Part>> {
                     s = j;
                 }
                 number_str = format!("{}{}", number_str, c);
-                         
-                if (j == m - 1) || !chars[j+1].is_digit(10) {
+
+                if (j == m - 1) || !chars[j + 1].is_digit(10) {
                     parts_on_line.push(Part {
                         row: i,
                         start: s,
@@ -117,8 +119,8 @@ pub fn day_3_get_sum_of_gear_ratios(schematic: &str) -> usize {
             if c == '*' {
                 let mut adjacent_parts = HashSet::new();
 
-                for y in i-1..=i+1 {
-                    for x in j-1..=j+1 {
+                for y in i - 1..=i + 1 {
+                    for x in j - 1..=j + 1 {
                         if y == i && x == j {
                             continue;
                         }
@@ -138,7 +140,7 @@ pub fn day_3_get_sum_of_gear_ratios(schematic: &str) -> usize {
                     for part in adjacent_parts {
                         a = a * part;
                     }
-                    ans = ans + a; 
+                    ans = ans + a;
                 }
             }
         }
