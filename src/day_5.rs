@@ -77,8 +77,9 @@ pub fn day_5_get_lowest_location(almanac: &str) -> usize {
         let mut category = "seed";
         let mut number = seed;
         while category != "location" {
-            dbg!(category);
-            for (destination_range_start, source_range_start, range_length) in number_map.get(category).unwrap() {
+            for (destination_range_start, source_range_start, range_length) in
+                number_map.get(category).unwrap()
+            {
                 if number < *source_range_start {
                     // Number is outside of the mappings and is mapped directly to the same number
                     break;
@@ -95,6 +96,64 @@ pub fn day_5_get_lowest_location(almanac: &str) -> usize {
         if number < ans {
             ans = number;
         }
+    }
+
+    ans
+}
+
+fn combine_ranges(
+    number_map: HashMap<&str, Vec<(usize, usize, usize)>>,
+    category_map: HashMap<&str, &str>,
+) -> Vec<(usize, usize, usize)> {
+    let mut ranges = number_map.get("seed").unwrap().to_vec();
+    let mut category = category_map.get("seed").unwrap();
+    while *category != "location" {
+        let next_ranges = number_map.get(category).unwrap();
+
+        let new_ranges = Vec::new();
+
+        // TODO: Combine ranges somehow
+
+        ranges = new_ranges;
+        category = category_map.get(category).unwrap();
+    }
+
+    ranges
+}
+
+#[wasm_bindgen]
+pub fn day_5_get_lowest_location_part_2(almanac: &str) -> usize {
+    let (seeds, number_map, category_map) = parse_almanac(almanac);
+
+    let mut i = 0;
+    let mut ans = usize::MAX;
+    while i < seeds.len() - 1 {
+        for seed in seeds[i]..seeds[i] + seeds[i + 1] {
+            let mut category = "seed";
+            let mut number = seed;
+            while category != "location" {
+                for (destination_range_start, source_range_start, range_length) in
+                    number_map.get(category).unwrap()
+                {
+                    if number < *source_range_start {
+                        // Number is outside of the mappings and is mapped directly to the same number
+                        break;
+                    }
+                    if number < source_range_start + range_length {
+                        number = destination_range_start + (number - source_range_start);
+                        break;
+                    }
+                }
+                // If the loop completes, it also means that the number is outside any of the mappings and is unchanged
+                category = category_map.get(category).unwrap();
+            }
+
+            if number < ans {
+                ans = number;
+            }
+        }
+
+        i = i + 2;
     }
 
     ans
@@ -176,5 +235,10 @@ mod tests {
     #[test]
     fn test_day_5_get_lowest_location() {
         assert_eq!(35, day_5_get_lowest_location(EXAMPLE_ALMANAC));
+    }
+
+    #[test]
+    fn test_day_5_get_lowest_location_part_2() {
+        assert_eq!(46, day_5_get_lowest_location_part_2(EXAMPLE_ALMANAC));
     }
 }
