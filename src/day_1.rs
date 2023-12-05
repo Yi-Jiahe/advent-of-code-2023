@@ -126,7 +126,7 @@ mod tests {
         )*
         }
     }
-    
+
     #[test]
     fn test_get_sum_of_calibration_values_in_document() {
         assert_eq!(

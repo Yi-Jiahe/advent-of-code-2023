@@ -148,8 +148,8 @@ mod tests {
         test_game_is_valid_4: (("Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red", [12, 13, 14]), (4, false)),
         test_game_is_valid_5: (("Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green", [12, 13, 14]), (5, true)),
     }
-   
-   #[test]
+
+    #[test]
     fn test_day_2_get_sum_of_possible_game_ids() {
         assert_eq!(
             8,
@@ -162,7 +162,7 @@ mod tests {
             )
         );
     }
-   
+
     macro_rules! generate_minimum_power_tests {
         ($($name:ident: $value:expr,)*) => {
         $(
