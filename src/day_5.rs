@@ -62,51 +62,85 @@ fn parse_almanac(
         let range_length = numbers.next().unwrap();
         mappings.push((destination_range_start, source_range_start, range_length));
     }
+    mappings.sort_by(|a, b| a.1.cmp(&b.1));
+    number_map.insert(l, mappings.clone());
 
     (seeds, number_map, category_map)
+}
+
+#[wasm_bindgen]
+pub fn day_5_get_lowest_location(almanac: &str) -> usize {
+    let (seeds, number_map, category_map) = parse_almanac(almanac);
+
+    let mut ans = usize::MAX;
+    for seed in seeds {
+        let mut category = "seed";
+        let mut number = seed;
+        while category != "location" {
+            dbg!(category);
+            for (destination_range_start, source_range_start, range_length) in number_map.get(category).unwrap() {
+                if number < *source_range_start {
+                    // Number is outside of the mappings and is mapped directly to the same number
+                    break;
+                }
+                if number < source_range_start + range_length {
+                    number = destination_range_start + (number - source_range_start);
+                    break;
+                }
+            }
+            // If the loop completes, it also means that the number is outside any of the mappings and is unchanged
+            category = category_map.get(category).unwrap();
+        }
+
+        if number < ans {
+            ans = number;
+        }
+    }
+
+    ans
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    const EXAMPLE_ALMANAC: &str = r#"seeds: 79 14 55 13
+
+    seed-to-soil map:
+    50 98 2
+    52 50 48
+    
+    soil-to-fertilizer map:
+    0 15 37
+    37 52 2
+    39 0 15
+    
+    fertilizer-to-water map:
+    49 53 8
+    0 11 42
+    42 0 7
+    57 7 4
+    
+    water-to-light map:
+    88 18 7
+    18 25 70
+    
+    light-to-temperature map:
+    45 77 23
+    81 45 19
+    68 64 13
+    
+    temperature-to-humidity map:
+    0 69 1
+    1 0 69
+    
+    humidity-to-location map:
+    60 56 37
+    56 93 4"#;
+
     #[test]
     fn test_parse_almanac() {
-        let (seeds, number_map, category_map) = parse_almanac(
-            r#"seeds: 79 14 55 13
-
-        seed-to-soil map:
-        50 98 2
-        52 50 48
-        
-        soil-to-fertilizer map:
-        0 15 37
-        37 52 2
-        39 0 15
-        
-        fertilizer-to-water map:
-        49 53 8
-        0 11 42
-        42 0 7
-        57 7 4
-        
-        water-to-light map:
-        88 18 7
-        18 25 70
-        
-        light-to-temperature map:
-        45 77 23
-        81 45 19
-        68 64 13
-        
-        temperature-to-humidity map:
-        0 69 1
-        1 0 69
-        
-        humidity-to-location map:
-        60 56 37
-        56 93 4"#,
-        );
+        let (seeds, number_map, category_map) = parse_almanac(EXAMPLE_ALMANAC);
 
         assert_eq!(vec![79, 14, 55, 13], seeds);
         // Tuples are ordered by the 2nd element
@@ -120,7 +154,8 @@ mod tests {
                     vec![(42, 0, 7), (57, 7, 4), (0, 11, 42), (49, 53, 8)]
                 ),
                 ("light", vec![(81, 45, 19), (68, 64, 13), (45, 77, 23)]),
-                ("temperature", vec![(1, 0, 69), (0, 69, 1)])
+                ("temperature", vec![(1, 0, 69), (0, 69, 1)]),
+                ("humidity", vec![(60, 56, 37), (56, 93, 4)])
             ]),
             number_map
         );
@@ -136,5 +171,10 @@ mod tests {
             ]),
             category_map
         );
+    }
+
+    #[test]
+    fn test_day_5_get_lowest_location() {
+        assert_eq!(35, day_5_get_lowest_location(EXAMPLE_ALMANAC));
     }
 }
