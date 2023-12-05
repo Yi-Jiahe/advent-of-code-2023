@@ -48,6 +48,7 @@ fn parse_almanac(
         }
 
         if line == "" {
+            // Sort mappings by source_range_start
             mappings.sort_by(|a, b| a.1.cmp(&b.1));
             number_map.insert(l, mappings.clone());
 
@@ -125,10 +126,44 @@ fn combine_ranges(
 pub fn day_5_get_lowest_location_part_2(almanac: &str) -> usize {
     let (seeds, number_map, category_map) = parse_almanac(almanac);
 
+    let mut seed_ranges = Vec::new();
     let mut i = 0;
-    let mut ans = usize::MAX;
     while i < seeds.len() - 1 {
-        for seed in seeds[i]..seeds[i] + seeds[i + 1] {
+        seed_ranges.push((seeds[i], seeds[i] + seeds[i + 1]));
+        i = i + 2;
+    }
+
+    // Remove overlaps
+    seed_ranges.sort_by(|a, b| a.0.cmp(&b.0));
+    dbg!(&seed_ranges);
+    let mut condensed_seed_ranges = Vec::new();
+    let mut prev_range = seed_ranges[0];
+    for range in &seed_ranges[1..] {
+        if range.0 > prev_range.1 {
+            // Non-overlapping: Save the last range and continue with this one
+            condensed_seed_ranges.push(prev_range);
+            prev_range = *range;
+            continue;
+        }
+
+        if range.1 < prev_range.1 {
+            // Fully contained
+            continue;
+        }
+        
+        if range.0 < prev_range.1 && range.1 > prev_range.1 {
+            // Overlapping: combine the two
+            prev_range.1 = range.1;
+            continue;
+        }
+    }
+    condensed_seed_ranges.push(prev_range);
+    dbg!(&condensed_seed_ranges);
+
+    let mut ans = usize::MAX;
+    for range in condensed_seed_ranges {
+        dbg!(&range);
+        for seed in range.0..range.1 {
             let mut category = "seed";
             let mut number = seed;
             while category != "location" {
@@ -147,13 +182,11 @@ pub fn day_5_get_lowest_location_part_2(almanac: &str) -> usize {
                 // If the loop completes, it also means that the number is outside any of the mappings and is unchanged
                 category = category_map.get(category).unwrap();
             }
-
+    
             if number < ans {
                 ans = number;
             }
         }
-
-        i = i + 2;
     }
 
     ans
