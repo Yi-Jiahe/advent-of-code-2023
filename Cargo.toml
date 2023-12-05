@@ -7,6 +7,10 @@ edition = "2018"
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+[[bin]]
+name = "advent-of-code-2023"
+path = "src/bin.rs"
+
 [features]
 default = ["console_error_panic_hook"]
 
