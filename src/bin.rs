@@ -1,7 +1,7 @@
 use std::env;
 use std::fs;
 
-use aoc_restore_snow_operations::{day_1, day_2, day_3, day_4, day_5};
+use aoc_restore_snow_operations::{day_1, day_2, day_3, day_4, day_5, day_6};
 
 pub fn main() {
     let args: Vec<String> = env::args().collect();
@@ -37,6 +37,9 @@ pub fn main() {
         5 => {
             println!("{}", day_5::day_5_get_lowest_location(&contents));
             println!("{}", day_5::day_5_get_lowest_location_part_2(&contents));
+        }
+        6 => {
+          println!("{}", day_6::day_6_product_of_ways_to_beat_each_race(&contents));
         }
         _ => {
             println!("Day {} not implemented", day);
