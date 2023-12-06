@@ -150,10 +150,12 @@ pub fn day_5_get_lowest_location_part_2(almanac: &str) -> usize {
             for range in &ranges {
                 let mut start = range.0;
                 let end = range.1;
-                for (i, (destination_range_start, source_range_start, range_length)) in mappings.iter().enumerate() {
+                for (i, (destination_range_start, source_range_start, range_length)) in
+                    mappings.iter().enumerate()
+                {
                     // Out of the mapping, check the next mapping
                     if start >= source_range_start + range_length {
-                        if i == mappings.len() - 1{
+                        if i == mappings.len() - 1 {
                             // Catch all if the range doesn't sit in any of the mappings
                             new_ranges.push((start, end));
                         }
@@ -208,7 +210,6 @@ pub fn day_5_get_lowest_location_part_2(almanac: &str) -> usize {
                     start = source_range_start + range_length;
                     continue;
                 }
-   
             }
             ranges = new_ranges;
             category = category_map.get(category).unwrap();
