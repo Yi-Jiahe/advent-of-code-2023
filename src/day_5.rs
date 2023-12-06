@@ -102,26 +102,6 @@ pub fn day_5_get_lowest_location(almanac: &str) -> usize {
     ans
 }
 
-fn combine_ranges(
-    number_map: HashMap<&str, Vec<(usize, usize, usize)>>,
-    category_map: HashMap<&str, &str>,
-) -> Vec<(usize, usize, usize)> {
-    let mut ranges = number_map.get("seed").unwrap().to_vec();
-    let mut category = category_map.get("seed").unwrap();
-    while *category != "location" {
-        let next_ranges = number_map.get(category).unwrap();
-
-        let new_ranges = Vec::new();
-
-        // TODO: Combine ranges somehow
-
-        ranges = new_ranges;
-        category = category_map.get(category).unwrap();
-    }
-
-    ranges
-}
-
 #[wasm_bindgen]
 pub fn day_5_get_lowest_location_part_2(almanac: &str) -> usize {
     let (seeds, number_map, category_map) = parse_almanac(almanac);
@@ -135,7 +115,6 @@ pub fn day_5_get_lowest_location_part_2(almanac: &str) -> usize {
 
     // Remove overlaps
     seed_ranges.sort_by(|a, b| a.0.cmp(&b.0));
-    dbg!(&seed_ranges);
     let mut condensed_seed_ranges = Vec::new();
     let mut prev_range = seed_ranges[0];
     for range in &seed_ranges[1..] {
@@ -150,7 +129,7 @@ pub fn day_5_get_lowest_location_part_2(almanac: &str) -> usize {
             // Fully contained
             continue;
         }
-        
+
         if range.0 < prev_range.1 && range.1 > prev_range.1 {
             // Overlapping: combine the two
             prev_range.1 = range.1;
@@ -158,33 +137,86 @@ pub fn day_5_get_lowest_location_part_2(almanac: &str) -> usize {
         }
     }
     condensed_seed_ranges.push(prev_range);
-    dbg!(&condensed_seed_ranges);
 
     let mut ans = usize::MAX;
-    for range in condensed_seed_ranges {
-        dbg!(&range);
-        for seed in range.0..range.1 {
-            let mut category = "seed";
-            let mut number = seed;
-            while category != "location" {
-                for (destination_range_start, source_range_start, range_length) in
-                    number_map.get(category).unwrap()
-                {
-                    if number < *source_range_start {
-                        // Number is outside of the mappings and is mapped directly to the same number
+    for seed_range in condensed_seed_ranges {
+        // Source ranges. Will be updated for each category
+        let mut ranges = vec![seed_range];
+        let mut category = "seed";
+        while category != "location" {
+            // Destination ranges
+            let mut new_ranges = Vec::new();
+            let mappings = number_map.get(category).unwrap();
+            for range in &ranges {
+                let mut start = range.0;
+                let end = range.1;
+                for (i, (destination_range_start, source_range_start, range_length)) in mappings.iter().enumerate() {
+                    // Out of the mapping, check the next mapping
+                    if start >= source_range_start + range_length {
+                        if i == mappings.len() - 1{
+                            // Catch all if the range doesn't sit in any of the mappings
+                            new_ranges.push((start, end));
+                        }
+                        continue;
+                    }
+
+                    if start < *source_range_start {
+                        // Range starts outside the mapping
+                        if end <= *source_range_start {
+                            // Range is completely outside any mappings
+                            new_ranges.push((start, end));
+                            break;
+                        }
+
+                        // Add the bit outside the mapping
+                        new_ranges.push((start, *source_range_start));
+
+                        // Add the bit inside the mapping
+                        if end <= source_range_start + range_length {
+                            new_ranges.push((
+                                *destination_range_start,
+                                *destination_range_start + (end - source_range_start),
+                            ));
+                            break;
+                        }
+
+                        // Add the bit inside the mapping and continue with the rest that doesn't fit.
+                        new_ranges.push((
+                            *destination_range_start,
+                            *destination_range_start + range_length,
+                        ));
+
+                        start = source_range_start + range_length;
+                        continue;
+                    }
+
+                    // Start is inside the range
+                    if end <= source_range_start + range_length {
+                        new_ranges.push((
+                            *destination_range_start + (start - source_range_start),
+                            *destination_range_start + (end - source_range_start),
+                        ));
                         break;
                     }
-                    if number < source_range_start + range_length {
-                        number = destination_range_start + (number - source_range_start);
-                        break;
-                    }
+
+                    // Add the bit inside the mapping and continue with the rest that doesn't fit.
+                    new_ranges.push((
+                        *destination_range_start + (start - source_range_start),
+                        *destination_range_start + range_length,
+                    ));
+
+                    start = source_range_start + range_length;
+                    continue;
                 }
-                // If the loop completes, it also means that the number is outside any of the mappings and is unchanged
-                category = category_map.get(category).unwrap();
+   
             }
-    
-            if number < ans {
-                ans = number;
+            ranges = new_ranges;
+            category = category_map.get(category).unwrap();
+        }
+
+        for (start, _) in ranges {
+            if start < ans {
+                ans = start
             }
         }
     }
