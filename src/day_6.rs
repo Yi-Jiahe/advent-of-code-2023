@@ -85,6 +85,7 @@ fn parse_document_part_2(document: &str) -> (usize, usize) {
     (time, distance)
 }
 
+#[wasm_bindgen]
 pub fn day_6_get_number_of_ways_to_win(document: &str) -> usize {
     let (time, distance) = parse_document_part_2(document);
 
