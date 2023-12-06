@@ -39,7 +39,11 @@ pub fn main() {
             println!("{}", day_5::day_5_get_lowest_location_part_2(&contents));
         }
         6 => {
-          println!("{}", day_6::day_6_product_of_ways_to_beat_each_race(&contents));
+            println!(
+                "{}",
+                day_6::day_6_product_of_ways_to_beat_each_race(&contents)
+            );
+            println!("{}", day_6::day_6_get_number_of_ways_to_win(&contents));
         }
         _ => {
             println!("Day {} not implemented", day);
