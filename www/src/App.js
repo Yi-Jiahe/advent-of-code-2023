@@ -7,7 +7,8 @@ import init, {
   day_3_get_sum_of_part_numbers, day_3_get_sum_of_gear_ratios,
   day_4_total_scratchcard_points, day_4_get_final_number_of_cards,
   day_5_get_lowest_location, day_5_get_lowest_location_part_2,
-  day_6_product_of_ways_to_beat_each_race, day_6_get_number_of_ways_to_win
+  day_6_product_of_ways_to_beat_each_race, day_6_get_number_of_ways_to_win,
+  day_7_calculate_total_winnings, day_7_calculate_total_winnings_part_2,
 } from "aoc-restore-snow-operations";
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
     [day_4_total_scratchcard_points, day_4_get_final_number_of_cards],
     [day_5_get_lowest_location, day_5_get_lowest_location_part_2],
     [day_6_product_of_ways_to_beat_each_race, day_6_get_number_of_ways_to_win],
+    [day_7_calculate_total_winnings, day_7_calculate_total_winnings_part_2],
   ];
 
   return (
