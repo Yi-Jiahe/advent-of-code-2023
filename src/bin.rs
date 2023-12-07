@@ -21,33 +21,37 @@ pub fn main() {
                 "{}",
                 day_1::day_1_get_sum_of_calibration_values_in_document_part_2(&contents)
             );
-        },
+        }
         2 => {
             println!("{}", day_2::day_2_get_sum_of_possible_game_ids(&contents));
             println!("{}", day_2::day_2_get_sum_of_minimum_power(&contents));
-        },
+        }
         3 => {
             println!("{}", day_3::day_3_get_sum_of_part_numbers(&contents));
             println!("{}", day_3::day_3_get_sum_of_gear_ratios(&contents));
-        },
+        }
         4 => {
             println!("{}", day_4::day_4_total_scratchcard_points(&contents));
             println!("{}", day_4::day_4_get_final_number_of_cards(&contents));
-        },
+        }
         5 => {
             println!("{}", day_5::day_5_get_lowest_location(&contents));
             println!("{}", day_5::day_5_get_lowest_location_part_2(&contents));
-        },
+        }
         6 => {
             println!(
                 "{}",
                 day_6::day_6_product_of_ways_to_beat_each_race(&contents)
             );
             println!("{}", day_6::day_6_get_number_of_ways_to_win(&contents));
-        },
+        }
         7 => {
             println!("{}", day_7::day_7_calculate_total_winnings(&contents));
-        },
+            println!(
+                "{}",
+                day_7::day_7_calculate_total_winnings_part_2(&contents)
+            );
+        }
         _ => {
             println!("Day {} not implemented", day);
         }
