@@ -20,7 +20,7 @@ enum HandType {
     FiveOfAKind,
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 struct Hand<'a> {
     cards: &'a str,
     hand_hype: HandType,
@@ -88,9 +88,41 @@ fn determine_type(hand: &str) -> HandType {
     }
 }
 
+pub fn day_7_calculate_total_winnings(hands: &str) -> usize {
+    let mut acc = 0;
+    let mut hands_and_bids: Vec<(Hand, usize)> = hands
+        .split("\n")
+        .map(|line| {
+            let mut line_iterator = line.trim().split_whitespace().map(|x| x.trim());
+            let cards = line_iterator.next().unwrap();
+            let bid = line_iterator.next().unwrap().parse::<usize>().unwrap();
+            (
+                Hand {
+                    cards: cards,
+                    hand_hype: determine_type(cards),
+                },
+                bid,
+            )
+        })
+        .collect();
+    hands_and_bids.sort_by(|a, b| a.0.cmp(&b.0));
+
+    for (i, (_, bid)) in hands_and_bids.iter().enumerate() {
+        acc = acc + ((i + 1) * bid);
+    }
+
+    return acc;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    const EXAMPLE: &str = r#"32T3K 765
+    T55J5 684
+    KK677 28
+    KTJJT 220
+    QQQJA 483"#;
 
     macro_rules! generate_determine_type_test {
         ($($name:ident: $value:expr,)*) => {
@@ -126,5 +158,10 @@ mod tests {
             ["32T3K", "KTJJT", "KK677", "T55J5", "QQQJA"],
             hands.map(|hand| hand.cards)
         );
+    }
+
+    #[test]
+    fn test_day_7_calculate_total_winnings() {
+        assert_eq!(6440, day_7_calculate_total_winnings(EXAMPLE));
     }
 }
