@@ -1,24 +1,12 @@
 use wasm_bindgen::prelude::*;
 
 use std::cmp::Ordering;
-use std::iter::zip;
 use std::collections::HashMap;
+use std::iter::zip;
 
-static card_order: HashMap<char, usize> = Lazy::new(|| HashMap::from([
-    ('2', 0),
-    ('3', 1),
-    ('4', 2),
-    ('5', 3),
-    ('6', 4),
-    ('7', 5),
-    ('8', 6),
-    ('9', 7),
-    ('T', 8),
-    ('J', 9),
-    ('Q', 10),
-    ('K', 11),
-    ('A', 12),
-]));
+const CARD_ORDER: [char; 13] = [
+    '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A',
+];
 
 // When derived on enums, variants are ordered by their discriminants. By default, the discriminant is smallest for variants at the top, and largest for variants at the bottom.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -29,7 +17,7 @@ enum HandType {
     ThreeOfAKind,
     FullHouse,
     FourOfAKind,
-    FiveOfAKind
+    FiveOfAKind,
 }
 
 #[derive(PartialEq, Eq)]
@@ -42,11 +30,13 @@ impl Ord for Hand<'_> {
     fn cmp(&self, other: &Self) -> Ordering {
         if self.hand_hype == other.hand_hype {
             for (l, r) in zip(self.cards.chars(), other.cards.chars()) {
-                // TODO: Implement proper sort order for cards
-                let l_value = card_order.get(&l).unwrap();
-                let r_value = card_order.get(&r).unwrap();
-                if l_value == r_value { continue; }
-                return l_value.cmp(&r_value);
+                if l == r {
+                    continue;
+                }
+                return CARD_ORDER
+                    .iter()
+                    .position(|c| c == &l)
+                    .cmp(&CARD_ORDER.iter().position(|c| c == &r));
             }
         }
         self.hand_hype.cmp(&other.hand_hype)
@@ -127,8 +117,14 @@ mod tests {
 
     #[test]
     fn test_hand_sort() {
-        let mut hands = ["32T3K", "T55J5", "KK677", "KTJJT", "QQQJA"].map(|cards| Hand{cards: cards, hand_hype: determine_type(cards)});
+        let mut hands = ["32T3K", "T55J5", "KK677", "KTJJT", "QQQJA"].map(|cards| Hand {
+            cards: cards,
+            hand_hype: determine_type(cards),
+        });
         hands.sort();
-        assert_eq!(["32T3K", "KTJJT", "KK677", "T55J5", "QQQJA"], hands.map(|hand| hand.cards));
+        assert_eq!(
+            ["32T3K", "KTJJT", "KK677", "T55J5", "QQQJA"],
+            hands.map(|hand| hand.cards)
+        );
     }
 }
