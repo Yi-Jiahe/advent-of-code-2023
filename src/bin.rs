@@ -54,6 +54,7 @@ pub fn main() {
         },
         8 => {
           println!("{}", day_8::day_8_steps_required_following_instructions(&contents));
+          println!("{}", day_8::day_8_steps_required_following_instructions_part_2(&contents));
         }
         _ => {
             println!("Day {} not implemented", day);
