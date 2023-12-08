@@ -33,6 +33,34 @@ fn parse_documents(documents: &str) -> (&str, HashMap<&str, (&str, &str)>) {
     (left_right_instructions, nodes)
 }
 
+#[wasm_bindgen]
+pub fn day_8_steps_required_following_instructions(documents: &str) -> usize {
+    let (instructions, nodes) = parse_documents(documents);
+
+    let mut steps = 0;
+    let mut i = 0;
+    let n = instructions.len();
+
+    let mut node = "AAA";
+    while node != "ZZZ" {
+        steps = steps + 1;
+        let instruction = instructions.chars().nth(i).unwrap();
+        let paths = nodes.get(node).unwrap();
+        node = match instruction {
+            'L' => paths.0,
+            'R' => paths.1,
+            _ => unreachable!(),
+        };
+
+        i = i + 1;
+        if i >= n {
+            i = 0;
+        }
+    }
+
+    steps
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -47,11 +75,15 @@ mod tests {
     GGG = (GGG, GGG)
     ZZZ = (ZZZ, ZZZ)"#;
 
+    const EXAMPLE_2: &str = r#"LLR
+
+    AAA = (BBB, BBB)
+    BBB = (AAA, ZZZ)
+    ZZZ = (ZZZ, ZZZ)"#;
+
     #[test]
-    fn test_parse_documents() {
-        let (left_right_instructions, nodes) = parse_documents(EXAMPLE_1);
-        dbg!(left_right_instructions);
-        dbg!(nodes);
-        assert_eq!(1, 2);
+    fn test_day_8_steps_required_following_instructions() {
+        assert_eq!(2, day_8_steps_required_following_instructions(EXAMPLE_1));
+        assert_eq!(6, day_8_steps_required_following_instructions(EXAMPLE_2));
     }
 }
