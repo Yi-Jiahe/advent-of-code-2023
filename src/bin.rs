@@ -64,6 +64,10 @@ pub fn main() {
         }
         9 => {
             println!("{}", day_9::day_9_sum_of_extrapolated_values(&contents));
+            println!(
+                "{}",
+                day_9::day_9_sum_of_extrapolated_previous_values(&contents)
+            );
         }
         _ => {
             println!("Day {} not implemented", day);
