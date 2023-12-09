@@ -15,21 +15,12 @@ fn parse_documents(documents: &str) -> (&str, HashMap<&str, (&str, &str)>) {
     let re = Regex::new(r"^([1-9A-Z]+) = \(([1-9A-Z]+), ([1-9A-Z]+)\)$").unwrap();
     for line in document_iterator {
         let caps = re.captures(line).unwrap();
-        let node = caps
-        .get(1)
-        .unwrap()
-        .as_str();
-        let l = caps
-        .get(2)
-        .unwrap()
-        .as_str();
-        let r = caps
-        .get(3)
-        .unwrap()
-        .as_str();
+        let node = caps.get(1).unwrap().as_str();
+        let l = caps.get(2).unwrap().as_str();
+        let r = caps.get(3).unwrap().as_str();
         nodes.insert(node, (l, r));
     }
-    
+
     (left_right_instructions, nodes)
 }
 
@@ -76,7 +67,12 @@ fn is_end_node(node: &str) -> bool {
     node.chars().nth(2).unwrap() == 'Z'
 }
 
-fn to_next_end<'a>(current: (&'a str, usize), instructions: &str, n: usize, nodes: &HashMap<&'a str, (&'a str, &'a str)>) -> ((&'a str, usize), usize) {
+fn to_next_end<'a>(
+    current: (&'a str, usize),
+    instructions: &str,
+    n: usize,
+    nodes: &HashMap<&'a str, (&'a str, &'a str)>,
+) -> ((&'a str, usize), usize) {
     let (mut node, mut i) = current;
 
     let mut steps = 0;
@@ -96,12 +92,10 @@ fn to_next_end<'a>(current: (&'a str, usize), instructions: &str, n: usize, node
         if i >= n {
             i = 0;
         }
-        
+
         if is_end_node(node) {
             return ((node, i), steps);
         }
-
-
     }
 }
 
@@ -113,7 +107,10 @@ pub fn day_8_steps_required_following_instructions_part_2(documents: &str) -> us
 
     let n = instructions.len();
 
-    let mut active_nodes: Vec<(&str, usize, usize)> = identify_starting_nodes(&nodes).iter().map(|node| (*node, 0, 0)).collect();
+    let mut active_nodes: Vec<(&str, usize, usize)> = identify_starting_nodes(&nodes)
+        .iter()
+        .map(|node| (*node, 0, 0))
+        .collect();
     let m = active_nodes.len();
 
     let mut done = true;
@@ -122,7 +119,7 @@ pub fn day_8_steps_required_following_instructions_part_2(documents: &str) -> us
         for i in 0..m {
             let (node, j, mut steps_taken) = active_nodes[i];
 
-            // Let the others catch up first 
+            // Let the others catch up first
             if steps_taken >= max_steps && max_steps != 0 {
                 continue;
             }
@@ -132,9 +129,12 @@ pub fn day_8_steps_required_following_instructions_part_2(documents: &str) -> us
             }
 
             let ((next_node, next_j), steps_required) = match memo.get(&(node, j)) {
-                Some(((next_node, next_j), steps_required)) => ((*next_node, *next_j), *steps_required),
+                Some(((next_node, next_j), steps_required)) => {
+                    ((*next_node, *next_j), *steps_required)
+                }
                 None => {
-                    let ((next_node, next_j), steps_required) = to_next_end((node, j), instructions, n, &nodes);
+                    let ((next_node, next_j), steps_required) =
+                        to_next_end((node, j), instructions, n, &nodes);
                     memo.insert((node, j), ((next_node, next_j), steps_required));
                     dbg!(&memo);
                     ((next_node, next_j), steps_required)
@@ -209,6 +209,9 @@ mod tests {
 
     #[test]
     fn test_day_8_steps_required_following_instructions_part_2() {
-        assert_eq!(6, day_8_steps_required_following_instructions_part_2(EXAMPLE_3));
+        assert_eq!(
+            6,
+            day_8_steps_required_following_instructions_part_2(EXAMPLE_3)
+        );
     }
 }
