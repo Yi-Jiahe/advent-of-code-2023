@@ -1,7 +1,7 @@
 use std::env;
 use std::fs;
 
-use aoc_restore_snow_operations::{day_1, day_2, day_3, day_4, day_5, day_6, day_7, day_8};
+use aoc_restore_snow_operations::{day_1, day_2, day_3, day_4, day_5, day_6, day_7, day_8, day_9};
 
 pub fn main() {
     let args: Vec<String> = env::args().collect();
@@ -51,10 +51,19 @@ pub fn main() {
                 "{}",
                 day_7::day_7_calculate_total_winnings_part_2(&contents)
             );
-        },
+        }
         8 => {
-          println!("{}", day_8::day_8_steps_required_following_instructions(&contents));
-          println!("{}", day_8::day_8_steps_required_following_instructions_part_2(&contents));
+            println!(
+                "{}",
+                day_8::day_8_steps_required_following_instructions(&contents)
+            );
+            println!(
+                "{}",
+                day_8::day_8_steps_required_following_instructions_part_2(&contents)
+            );
+        }
+        9 => {
+            println!("{}", day_9::day_9_sum_of_extrapolated_values(&contents));
         }
         _ => {
             println!("Day {} not implemented", day);
