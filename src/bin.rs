@@ -73,6 +73,10 @@ pub fn main() {
         }
         10 => {
             println!("{}", day_10::day_10_find_furthest_point(&contents));
+            println!(
+                "{}",
+                day_10::day_10_find_number_of_tiles_enclosed(&contents)
+            );
         }
         _ => {
             println!("Day {} not implemented", day);
