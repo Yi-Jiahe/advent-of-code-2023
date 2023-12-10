@@ -1,7 +1,9 @@
 use std::env;
 use std::fs;
 
-use aoc_restore_snow_operations::{day_1, day_2, day_3, day_4, day_5, day_6, day_7, day_8, day_9};
+use aoc_restore_snow_operations::{
+    day_1, day_10, day_2, day_3, day_4, day_5, day_6, day_7, day_8, day_9,
+};
 
 pub fn main() {
     let args: Vec<String> = env::args().collect();
@@ -68,6 +70,9 @@ pub fn main() {
                 "{}",
                 day_9::day_9_sum_of_extrapolated_previous_values(&contents)
             );
+        }
+        10 => {
+            println!("{}", day_10::day_10_find_furthest_point(&contents));
         }
         _ => {
             println!("Day {} not implemented", day);
