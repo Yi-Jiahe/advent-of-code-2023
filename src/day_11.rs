@@ -1,6 +1,9 @@
+use wasm_bindgen::prelude::*;
+
+use std::cmp::{max, min};
 use std::collections::HashSet;
 
-fn parse_galaxy(
+fn parse_image(
     image: &str,
 ) -> (
     (usize, usize),
@@ -36,9 +39,9 @@ fn parse_galaxy(
 
 fn expand_universe(
     size: (usize, usize),
-    empty_rows: HashSet<usize>,
-    empty_cols: HashSet<usize>,
-    galaxies: HashSet<(usize, usize)>,
+    empty_rows: &HashSet<usize>,
+    empty_cols: &HashSet<usize>,
+    galaxies: &HashSet<(usize, usize)>,
 ) -> HashSet<(usize, usize)> {
     let (n, m) = size;
 
@@ -51,8 +54,6 @@ fn expand_universe(
         expanded_rows[i] = i + skipped_rows;
     }
 
-    dbg!(&expanded_rows);
-
     let mut expanded_cols = vec![0; m];
     let mut skipped_cols = 0;
     for i in 0..m {
@@ -62,26 +63,44 @@ fn expand_universe(
         expanded_cols[i] = i + skipped_cols;
     }
 
-    dbg!(&expanded_cols);
-
     let mut expanded_galaxies = HashSet::<(usize, usize)>::new();
 
     for galaxy in galaxies {
-        let (i, j) = galaxy;
+        let (i, j) = *galaxy;
         expanded_galaxies.insert((expanded_rows[i], expanded_cols[j]));
     }
 
     expanded_galaxies
 }
 
+#[wasm_bindgen]
+pub fn day_11_sum_lengths_between_galaxies(image: &str) -> usize {
+    let (size, empty_rows, empty_cols, galaxies) = parse_image(image);
+    let expanded_galaxies = expand_universe(size, &empty_rows, &empty_cols, &galaxies)
+        .iter()
+        .map(|x| *x)
+        .collect::<Vec<(usize, usize)>>();
+
+    let n = expanded_galaxies.len();
+
+    let mut acc = 0;
+    for i in 0..n {
+        let (x0, y0) = expanded_galaxies[i];
+        for j in i + 1..n {
+            let (x1, y1) = expanded_galaxies[j];
+
+            acc = acc + (max(x1, x0) - min(x1, x0)) + (max(y1, y0) - min(y1, y0));
+        }
+    }
+
+    acc
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_parse_galaxy() {
-        let (size, empty_rows, empty_cols, galaxies) = parse_galaxy(
-            r#"...#......
+    const EXAMPLE: &str = r#"...#......
         .......#..
         #.........
         ..........
@@ -90,15 +109,18 @@ mod tests {
         .........#
         ..........
         .......#..
-        #...#....."#,
-        );
+        #...#....."#;
+
+    #[test]
+    fn test_parse_image() {
+        let (size, empty_rows, empty_cols, galaxies) = parse_image(EXAMPLE);
 
         assert_eq!((10, 10), size);
         assert_eq!(HashSet::from([3, 7]), empty_rows);
         assert_eq!(HashSet::from([2, 5, 8]), empty_cols);
 
-        let expanded_galaxies = expand_universe(size, empty_rows, empty_cols, galaxies);
-        let (_, _, _, parsed_expanded_galaxies) = parse_galaxy(
+        let expanded_galaxies = expand_universe(size, &empty_rows, &empty_cols, &galaxies);
+        let (_, _, _, parsed_expanded_galaxies) = parse_image(
             r#"....#........
         .........#...
         #............
@@ -113,5 +135,10 @@ mod tests {
         #....#......."#,
         );
         assert_eq!(parsed_expanded_galaxies, expanded_galaxies);
+    }
+
+    #[test]
+    fn test_day_11_sum_lengths_between_galaxies() {
+        assert_eq!(374, day_11_sum_lengths_between_galaxies(EXAMPLE))
     }
 }
