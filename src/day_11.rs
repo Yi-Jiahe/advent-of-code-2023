@@ -42,6 +42,7 @@ fn expand_universe(
     empty_rows: &HashSet<usize>,
     empty_cols: &HashSet<usize>,
     galaxies: &HashSet<(usize, usize)>,
+    times: usize,
 ) -> HashSet<(usize, usize)> {
     let (n, m) = size;
 
@@ -49,7 +50,7 @@ fn expand_universe(
     let mut skipped_rows = 0;
     for i in 0..n {
         if empty_rows.contains(&i) {
-            skipped_rows = skipped_rows + 1;
+            skipped_rows = skipped_rows + (times - 1);
         }
         expanded_rows[i] = i + skipped_rows;
     }
@@ -58,7 +59,7 @@ fn expand_universe(
     let mut skipped_cols = 0;
     for i in 0..m {
         if empty_cols.contains(&i) {
-            skipped_cols = skipped_cols + 1;
+            skipped_cols = skipped_cols + (times - 1);
         }
         expanded_cols[i] = i + skipped_cols;
     }
@@ -76,7 +77,30 @@ fn expand_universe(
 #[wasm_bindgen]
 pub fn day_11_sum_lengths_between_galaxies(image: &str) -> usize {
     let (size, empty_rows, empty_cols, galaxies) = parse_image(image);
-    let expanded_galaxies = expand_universe(size, &empty_rows, &empty_cols, &galaxies)
+    let expanded_galaxies = expand_universe(size, &empty_rows, &empty_cols, &galaxies, 2)
+        .iter()
+        .map(|x| *x)
+        .collect::<Vec<(usize, usize)>>();
+
+    let n = expanded_galaxies.len();
+
+    let mut acc = 0;
+    for i in 0..n {
+        let (x0, y0) = expanded_galaxies[i];
+        for j in i + 1..n {
+            let (x1, y1) = expanded_galaxies[j];
+
+            acc = acc + (max(x1, x0) - min(x1, x0)) + (max(y1, y0) - min(y1, y0));
+        }
+    }
+
+    acc
+}
+
+#[wasm_bindgen]
+pub fn day_11_sum_lengths_between_galaxies_part_2(image: &str) -> usize {
+    let (size, empty_rows, empty_cols, galaxies) = parse_image(image);
+    let expanded_galaxies = expand_universe(size, &empty_rows, &empty_cols, &galaxies, 1000000)
         .iter()
         .map(|x| *x)
         .collect::<Vec<(usize, usize)>>();
@@ -119,7 +143,7 @@ mod tests {
         assert_eq!(HashSet::from([3, 7]), empty_rows);
         assert_eq!(HashSet::from([2, 5, 8]), empty_cols);
 
-        let expanded_galaxies = expand_universe(size, &empty_rows, &empty_cols, &galaxies);
+        let expanded_galaxies = expand_universe(size, &empty_rows, &empty_cols, &galaxies, 2);
         let (_, _, _, parsed_expanded_galaxies) = parse_image(
             r#"....#........
         .........#...

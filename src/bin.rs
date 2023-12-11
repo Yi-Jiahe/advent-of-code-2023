@@ -80,6 +80,10 @@ pub fn main() {
         }
         11 => {
             println!("{}", day_11::day_11_sum_lengths_between_galaxies(&contents));
+            println!(
+                "{}",
+                day_11::day_11_sum_lengths_between_galaxies_part_2(&contents)
+            );
         }
         _ => {
             println!("Day {} not implemented", day);
