@@ -94,6 +94,7 @@ pub fn main() {
         }
         13 => {
             println!("{}", day_13::day_13_summarize_notes(&contents));
+            println!("{}", day_13::day_13_summarize_notes_part_2(&contents));
         }
         _ => {
             println!("Day {} not implemented", day);
