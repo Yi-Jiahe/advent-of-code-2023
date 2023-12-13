@@ -2,7 +2,7 @@ use std::env;
 use std::fs;
 
 use aoc_restore_snow_operations::{
-    day_1, day_10, day_11, day_12, day_2, day_3, day_4, day_5, day_6, day_7, day_8, day_9,
+    day_1, day_10, day_11, day_12, day_13, day_2, day_3, day_4, day_5, day_6, day_7, day_8, day_9,
 };
 
 pub fn main() {
@@ -91,6 +91,9 @@ pub fn main() {
                 "{}",
                 day_12::day_12_sum_of_possible_arrangements_part_2(&contents)
             );
+        }
+        13 => {
+            println!("{}", day_13::day_13_summarize_notes(&contents));
         }
         _ => {
             println!("Day {} not implemented", day);
