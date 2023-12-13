@@ -87,6 +87,10 @@ pub fn main() {
         }
         12 => {
             println!("{}", day_12::day_12_sum_of_possible_arrangements(&contents));
+            println!(
+                "{}",
+                day_12::day_12_sum_of_possible_arrangements_part_2(&contents)
+            );
         }
         _ => {
             println!("Day {} not implemented", day);

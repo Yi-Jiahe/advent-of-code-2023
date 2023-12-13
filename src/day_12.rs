@@ -1,5 +1,7 @@
 use wasm_bindgen::prelude::*;
 
+use std::iter;
+
 fn is_valid(
     condition: &str,
     contiguous_groups_of_damaged_springs: &Vec<usize>,
@@ -137,6 +139,26 @@ pub fn day_12_sum_of_possible_arrangements(condition_records: &str) -> usize {
     acc
 }
 
+pub fn day_12_sum_of_possible_arrangements_part_2(condition_records: &str) -> usize {
+    let mut acc = 0;
+    for line in condition_records.split("\n").map(|line| line.trim()) {
+        let (conditions, groups) = parse_line(line);
+        let new_conditions = iter::repeat(conditions)
+            .take(5)
+            .collect::<Vec<&str>>()
+            .join("?");
+        let mut new_groups = groups.clone();
+        for _ in 1..5 {
+            new_groups.append(&mut groups.clone());
+        }
+        let a = find_different_arrangements(&new_conditions, &new_groups, 0);
+        dbg!(a);
+        acc = acc + a;
+    }
+
+    acc
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -203,6 +225,23 @@ mod tests {
         assert_eq!(
             10,
             find_different_arrangements("?###????????", &vec![3, 2, 1], 0)
+        );
+    }
+
+    // Takes a while to run
+    #[ignore]
+    #[test]
+    fn test_find_different_arrangements_part_2() {
+        assert_eq!(
+            525152,
+            day_12_sum_of_possible_arrangements_part_2(
+                r#"???.### 1,1,3
+        .??..??...?##. 1,1,3
+        ?#?#?#?#?#?#?#? 1,3,1,6
+        ????.#...#... 4,1,1
+        ????.######..#####. 1,6,5
+        ?###???????? 3,2,1"#
+            )
         );
     }
 }
