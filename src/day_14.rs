@@ -80,7 +80,7 @@ fn tilt_platform(platform: &Vec<Vec<char>>, direction: &Direction) -> Vec<Vec<ch
                         }
                         '#' => {
                             // Roll rocks
-                            for x in (last_anchor - rounded_rocks + 1)..=last_anchor {
+                            for x in (last_anchor + 1 - rounded_rocks)..=last_anchor {
                                 new_state[x][j] = 'O'
                             }
 
@@ -95,7 +95,7 @@ fn tilt_platform(platform: &Vec<Vec<char>>, direction: &Direction) -> Vec<Vec<ch
                 }
 
                 if rounded_rocks != 0 {
-                    for x in (last_anchor - rounded_rocks + 1)..=last_anchor {
+                    for x in (last_anchor + 1 - rounded_rocks)..=last_anchor {
                         new_state[x][j] = 'O'
                     }
                 }
@@ -114,7 +114,7 @@ fn tilt_platform(platform: &Vec<Vec<char>>, direction: &Direction) -> Vec<Vec<ch
                         }
                         '#' => {
                             // Roll rocks
-                            for y in (last_anchor - rounded_rocks + 1)..=last_anchor {
+                            for y in (last_anchor + 1 - rounded_rocks)..=last_anchor {
                                 new_state[i][y] = 'O'
                             }
 
@@ -129,7 +129,7 @@ fn tilt_platform(platform: &Vec<Vec<char>>, direction: &Direction) -> Vec<Vec<ch
                 }
 
                 if rounded_rocks != 0 {
-                    for y in (last_anchor - rounded_rocks + 1)..=last_anchor {
+                    for y in (last_anchor + 1 - rounded_rocks)..=last_anchor {
                         new_state[i][y] = 'O'
                     }
                 }
