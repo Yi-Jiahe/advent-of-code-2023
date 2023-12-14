@@ -9,3 +9,5 @@ Implmenting the outer cache without any cycle detection resulted in:
  - 999993 outer cache hits out of 1000000 attempts
 
 In other words the inner cache is practically useless and the outer cache doesn't reduce the runtime sufficiently.
+
+Implementing the cycle was pretty confusing, especially with the counting of which cycle the iteration is currently on. I got caught up on an off by one error for a bit.

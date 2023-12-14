@@ -196,22 +196,35 @@ fn run_spin_cycles(platform: &Vec<Vec<char>>, n: usize) -> Vec<Vec<char>> {
     let mut cycle_cache: HashMap<Vec<Vec<char>>, Vec<Vec<char>>> = HashMap::new();
     let mut tilt_cache: HashMap<(Vec<Vec<char>>, Direction), Vec<Vec<char>>> = HashMap::new();
 
-    let mut outer_cache_hits = 0;
+    let (mut outer_cache_hits, mut outer_cache_misses) = (0, 0);
     let (mut inner_cache_hits, mut inner_cache_misses) = (0, 0);
 
+    // Manually execute the cycles until the outer cache registers a hit, indicating that we have visited a state before
+    // Because we are applying the same operation to the state, this will eventually lead us to state where we first got a hit on the other cache, i.e. a cycle
+    // Remember this first state to find the size of the large cycle
+    let mut manual_cycles = 0;
+    let mut large_cycle_end = None;
     for i in 0..n {
         let mut intermediate_state = current_state.clone();
-        current_state = if let Some(new_state) = cycle_cache.get(&current_state.clone()) {
-            outer_cache_hits= outer_cache_hits + 1;
-            new_state.to_vec()
+        if let Some(new_state) = cycle_cache.get(&current_state.clone()) {
+            outer_cache_hits = outer_cache_hits + 1;
+
+            large_cycle_end = Some(current_state.clone());
+
+            current_state = new_state.to_vec();
+
+            manual_cycles = i + 1;
+            break;
         } else {
+            outer_cache_misses = outer_cache_misses + 1;
             for direction in [
                 Direction::North,
                 Direction::West,
                 Direction::South,
                 Direction::East,
             ] {
-                intermediate_state = if let Some(new_state) = tilt_cache.get(&(intermediate_state.clone(), direction.clone()))
+                intermediate_state = if let Some(new_state) =
+                    tilt_cache.get(&(intermediate_state.clone(), direction.clone()))
                 {
                     inner_cache_hits = inner_cache_hits + 1;
                     new_state.to_vec()
@@ -223,14 +236,65 @@ fn run_spin_cycles(platform: &Vec<Vec<char>>, n: usize) -> Vec<Vec<char>> {
                 }
             }
             cycle_cache.insert(current_state, intermediate_state.clone());
-            intermediate_state
-        }  
+            current_state = intermediate_state
+        }
     }
 
-    println!("{} inner cache hits out of {} attempts", inner_cache_hits, inner_cache_hits + inner_cache_misses);
-    println!("{} outer cache hits out of {} attempts", outer_cache_hits, n);
+    // If we have not detected a cycle, it also means that we have completed the required number of cycles and can skip this step
+    if let Some(large_cycle_end) = large_cycle_end {
+        println!("Detected large cycle");
 
-   current_state 
+        // Determine the size of the large cycle by iterating until we find the first state
+        let mut large_cycle_length = 0;
+        for i in manual_cycles..n {
+            if let Some(new_state) = cycle_cache.get(&current_state.clone()) {
+                outer_cache_hits = outer_cache_hits + 1;
+
+                current_state = new_state.to_vec();
+
+                if current_state == large_cycle_end {
+                    large_cycle_length = i - manual_cycles;
+                    manual_cycles = i + 1;
+                    break;
+                }
+            } else {
+                unreachable!();
+            }
+        }
+
+        println!("Determined large cycle length: {}", large_cycle_length);
+
+        let cycles_remaining = n - manual_cycles;
+
+        println!("Current cycle: {}, Remaining cycles: {}", manual_cycles, cycles_remaining);
+
+        let skipped_cycles = (cycles_remaining / large_cycle_length) * large_cycle_length;
+        let next_manual_cycle = manual_cycles + skipped_cycles;
+
+        println!("Skipping ahead {} cycles to cycle {}", skipped_cycles, next_manual_cycle);
+
+        for _ in next_manual_cycle..n {
+            if let Some(new_state) = cycle_cache.get(&current_state.clone()) {
+                outer_cache_hits = outer_cache_hits + 1;
+
+                current_state = new_state.to_vec();
+            } else {
+                unreachable!();
+            }
+        }
+    }
+
+    println!(
+        "{} inner cache hits out of {} attempts",
+        inner_cache_hits,
+        inner_cache_hits + inner_cache_misses
+    );
+    println!(
+        "{} outer cache hits out of {} attempts",
+        outer_cache_hits, outer_cache_hits + outer_cache_misses
+    );
+
+    current_state
 }
 
 pub fn day_14_calcuate_total_load_on_north_support_beams_part_2(input: &str) -> usize {
@@ -307,15 +371,13 @@ mod tests {
 
         platform = run_spin_cycles(&platform, 1000000);
         print_2d_matrix(&platform);
-
-        assert_eq!(1, 2)
     }
 
-    // #[test]
-    // fn test_day_14_calcuate_total_load_on_north_support_beams_part_2() {
-    //     assert_eq!(
-    //         64,
-    //         day_14_calcuate_total_load_on_north_support_beams_part_2(EXAMPLE)
-    //     );
-    // }
+    #[test]
+    fn test_day_14_calcuate_total_load_on_north_support_beams_part_2() {
+        assert_eq!(
+            64,
+            day_14_calcuate_total_load_on_north_support_beams_part_2(EXAMPLE)
+        );
+    }
 }

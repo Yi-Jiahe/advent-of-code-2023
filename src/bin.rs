@@ -102,6 +102,10 @@ pub fn main() {
                 "{}",
                 day_14::day_14_calcuate_total_load_on_north_support_beams(&contents)
             );
+            println!(
+                "{}",
+                day_14::day_14_calcuate_total_load_on_north_support_beams_part_2(&contents)
+            );
         }
         _ => {
             println!("Day {} not implemented", day);
