@@ -25,7 +25,7 @@ fn parse_input(input: &str) -> Vec<Vec<char>> {
     platform
 }
 
-fn tilt_platform<'a>(platform: &'a mut Vec<Vec<char>>, direction: Direction) -> &'a Vec<Vec<char>> {
+fn tilt_platform<'a>(platform: &'a mut Vec<Vec<char>>, direction: Direction) {
     let n = platform.len();
     let m = platform[0].len();
 
@@ -163,14 +163,39 @@ fn tilt_platform<'a>(platform: &'a mut Vec<Vec<char>>, direction: Direction) -> 
             }
         }
     }
-
-    platform
 }
 
 pub fn day_14_calcuate_total_load_on_north_support_beams(input: &str) -> usize {
     let mut platform = parse_input(input);
 
     tilt_platform(&mut platform, Direction::North);
+
+    let mut acc = 0;
+    let n = platform.len();
+    for i in 0..n {
+        for c in platform[i].iter() {
+            if *c == 'O' {
+                acc = acc + (n - i);
+            }
+        }
+    }
+
+    acc
+}
+
+fn run_spin_cycle<'a>(platform: &'a mut Vec<Vec<char>>) {
+    tilt_platform(platform, Direction::North);
+    tilt_platform(platform, Direction::West);
+    tilt_platform(platform, Direction::South);
+    tilt_platform(platform, Direction::East);
+}
+
+pub fn day_14_calcuate_total_load_on_north_support_beams_part_2(input: &str) -> usize {
+    let mut platform = parse_input(input);
+
+    for _ in 0..1000000000 {
+        run_spin_cycle(&mut platform);
+    }
 
     let mut acc = 0;
     let n = platform.len();
@@ -213,18 +238,42 @@ mod tests {
         let platform = parse_input(EXAMPLE);
         print_2d_matrix(&platform);
 
-        // let mut south_tilt = platform.clone();
-        // tilt_platform(&mut south_tilt, Direction::South);
-        // print_2d_matrix(&south_tilt);
+        let mut north_tilt = platform.clone();
+        tilt_platform(&mut north_tilt, Direction::North);
+        print_2d_matrix(&north_tilt);
 
-        // let mut west_tilt = platform.clone();
-        // tilt_platform(&mut west_tilt, Direction::West);
-        // print_2d_matrix(&west_tilt);
+        let mut south_tilt = platform.clone();
+        tilt_platform(&mut south_tilt, Direction::South);
+        print_2d_matrix(&south_tilt);
+
+        let mut west_tilt = platform.clone();
+        tilt_platform(&mut west_tilt, Direction::West);
+        print_2d_matrix(&west_tilt);
 
         let mut east_tilt = platform.clone();
         tilt_platform(&mut east_tilt, Direction::East);
         print_2d_matrix(&east_tilt);
+    }
 
-        assert_eq!(1, 2);
+    #[test]
+    fn test_spin_cycle() {
+        let mut platform = parse_input(EXAMPLE);
+
+        run_spin_cycle(&mut platform);
+        print_2d_matrix(&platform);
+        
+        run_spin_cycle(&mut platform);
+        print_2d_matrix(&platform);        
+        
+        run_spin_cycle(&mut platform);
+        print_2d_matrix(&platform);
+    }
+
+    #[test]
+    fn test_day_14_calcuate_total_load_on_north_support_beams_part_2() {
+        assert_eq!(
+            64,
+            day_14_calcuate_total_load_on_north_support_beams_part_2(EXAMPLE)
+        );
     }
 }
