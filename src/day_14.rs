@@ -1,5 +1,8 @@
 use crate::utils::print_2d_matrix;
 
+use std::collections::HashMap;
+
+#[derive(Eq, PartialEq, Hash, Clone)]
 enum Direction {
     North,
     South,
@@ -25,9 +28,11 @@ fn parse_input(input: &str) -> Vec<Vec<char>> {
     platform
 }
 
-fn tilt_platform<'a>(platform: &'a mut Vec<Vec<char>>, direction: Direction) {
+fn tilt_platform(platform: &Vec<Vec<char>>, direction: &Direction) -> Vec<Vec<char>> {
     let n = platform.len();
     let m = platform[0].len();
+
+    let mut new_state = platform.clone();
 
     match direction {
         Direction::North => {
@@ -39,12 +44,12 @@ fn tilt_platform<'a>(platform: &'a mut Vec<Vec<char>>, direction: Direction) {
                         '.' => {}
                         'O' => {
                             rounded_rocks = rounded_rocks + 1;
-                            platform[i][j] = '.'
+                            new_state[i][j] = '.'
                         }
                         '#' => {
                             // Roll rocks
                             for x in last_anchor..(last_anchor + rounded_rocks) {
-                                platform[x][j] = 'O'
+                                new_state[x][j] = 'O'
                             }
 
                             // Reset anchor variabes
@@ -57,7 +62,7 @@ fn tilt_platform<'a>(platform: &'a mut Vec<Vec<char>>, direction: Direction) {
 
                 if rounded_rocks != 0 {
                     for x in last_anchor..(last_anchor + rounded_rocks) {
-                        platform[x][j] = 'O'
+                        new_state[x][j] = 'O'
                     }
                 }
             }
@@ -71,12 +76,12 @@ fn tilt_platform<'a>(platform: &'a mut Vec<Vec<char>>, direction: Direction) {
                         '.' => {}
                         'O' => {
                             rounded_rocks = rounded_rocks + 1;
-                            platform[i][j] = '.'
+                            new_state[i][j] = '.'
                         }
                         '#' => {
                             // Roll rocks
                             for x in (last_anchor - rounded_rocks + 1)..=last_anchor {
-                                platform[x][j] = 'O'
+                                new_state[x][j] = 'O'
                             }
 
                             // Reset anchor variabes
@@ -91,7 +96,7 @@ fn tilt_platform<'a>(platform: &'a mut Vec<Vec<char>>, direction: Direction) {
 
                 if rounded_rocks != 0 {
                     for x in (last_anchor - rounded_rocks + 1)..=last_anchor {
-                        platform[x][j] = 'O'
+                        new_state[x][j] = 'O'
                     }
                 }
             }
@@ -105,12 +110,12 @@ fn tilt_platform<'a>(platform: &'a mut Vec<Vec<char>>, direction: Direction) {
                         '.' => {}
                         'O' => {
                             rounded_rocks = rounded_rocks + 1;
-                            platform[i][j] = '.'
+                            new_state[i][j] = '.'
                         }
                         '#' => {
                             // Roll rocks
                             for y in (last_anchor - rounded_rocks + 1)..=last_anchor {
-                                platform[i][y] = 'O'
+                                new_state[i][y] = 'O'
                             }
 
                             // Reset anchor variabes
@@ -125,7 +130,7 @@ fn tilt_platform<'a>(platform: &'a mut Vec<Vec<char>>, direction: Direction) {
 
                 if rounded_rocks != 0 {
                     for y in (last_anchor - rounded_rocks + 1)..=last_anchor {
-                        platform[i][y] = 'O'
+                        new_state[i][y] = 'O'
                     }
                 }
             }
@@ -139,12 +144,12 @@ fn tilt_platform<'a>(platform: &'a mut Vec<Vec<char>>, direction: Direction) {
                         '.' => {}
                         'O' => {
                             rounded_rocks = rounded_rocks + 1;
-                            platform[i][j] = '.'
+                            new_state[i][j] = '.'
                         }
                         '#' => {
                             // Roll rocks
                             for y in last_anchor..(last_anchor + rounded_rocks) {
-                                platform[i][y] = 'O'
+                                new_state[i][y] = 'O'
                             }
 
                             // Reset anchor variabes
@@ -157,23 +162,25 @@ fn tilt_platform<'a>(platform: &'a mut Vec<Vec<char>>, direction: Direction) {
 
                 if rounded_rocks != 0 {
                     for y in last_anchor..(last_anchor + rounded_rocks) {
-                        platform[i][y] = 'O'
+                        new_state[i][y] = 'O'
                     }
                 }
             }
         }
     }
+
+    new_state
 }
 
 pub fn day_14_calcuate_total_load_on_north_support_beams(input: &str) -> usize {
     let mut platform = parse_input(input);
 
-    tilt_platform(&mut platform, Direction::North);
+    let new_state = tilt_platform(&mut platform, &Direction::North);
 
     let mut acc = 0;
-    let n = platform.len();
+    let n = new_state.len();
     for i in 0..n {
-        for c in platform[i].iter() {
+        for c in new_state[i].iter() {
             if *c == 'O' {
                 acc = acc + (n - i);
             }
@@ -183,24 +190,46 @@ pub fn day_14_calcuate_total_load_on_north_support_beams(input: &str) -> usize {
     acc
 }
 
-fn run_spin_cycle<'a>(platform: &'a mut Vec<Vec<char>>) {
-    tilt_platform(platform, Direction::North);
-    tilt_platform(platform, Direction::West);
-    tilt_platform(platform, Direction::South);
-    tilt_platform(platform, Direction::East);
+fn run_spin_cycles(platform: &Vec<Vec<char>>, n: usize) -> Vec<Vec<char>> {
+    let mut final_state = platform.clone();
+
+    let mut cache_hits = 0;
+
+    let mut memo: HashMap<(Vec<Vec<char>>, Direction), Vec<Vec<char>>> = HashMap::new();
+
+    for _ in 0..n {
+        for direction in [
+            Direction::North,
+            Direction::West,
+            Direction::South,
+            Direction::East,
+        ] {
+            final_state = if let Some(new_state) = memo.get(&(final_state.clone(), direction.clone()))
+            {
+                cache_hits = cache_hits + 1;
+                new_state.to_vec()
+            } else {
+            let new_state = tilt_platform(&final_state, &direction);
+                memo.insert((final_state, direction), new_state.clone());
+                new_state
+            }
+        }
+    }
+
+    println!("Cache hit {} times out of {}", cache_hits, n*4);
+
+    final_state
 }
 
 pub fn day_14_calcuate_total_load_on_north_support_beams_part_2(input: &str) -> usize {
-    let mut platform = parse_input(input);
+    let platform = parse_input(input);
 
-    for _ in 0..1000000000 {
-        run_spin_cycle(&mut platform);
-    }
+    let new_state = run_spin_cycles(&platform, 1000000000);
 
     let mut acc = 0;
-    let n = platform.len();
+    let n = new_state.len();
     for i in 0..n {
-        for c in platform[i].iter() {
+        for c in new_state[i].iter() {
             if *c == 'O' {
                 acc = acc + (n - i);
             }
@@ -238,34 +267,33 @@ mod tests {
         let platform = parse_input(EXAMPLE);
         print_2d_matrix(&platform);
 
-        let mut north_tilt = platform.clone();
-        tilt_platform(&mut north_tilt, Direction::North);
+        let north_tilt = tilt_platform(&platform, &Direction::North);
         print_2d_matrix(&north_tilt);
 
-        let mut south_tilt = platform.clone();
-        tilt_platform(&mut south_tilt, Direction::South);
+        let south_tilt = tilt_platform(&platform, &Direction::South);
         print_2d_matrix(&south_tilt);
 
-        let mut west_tilt = platform.clone();
-        tilt_platform(&mut west_tilt, Direction::West);
-        print_2d_matrix(&west_tilt);
-
-        let mut east_tilt = platform.clone();
-        tilt_platform(&mut east_tilt, Direction::East);
+        let east_tilt = tilt_platform(&platform, &Direction::East);
         print_2d_matrix(&east_tilt);
+
+        let west_tilt = tilt_platform(&platform, &Direction::West);
+        print_2d_matrix(&west_tilt);
     }
 
     #[test]
     fn test_spin_cycle() {
         let mut platform = parse_input(EXAMPLE);
 
-        run_spin_cycle(&mut platform);
+        platform = run_spin_cycles(&platform, 1);
         print_2d_matrix(&platform);
-        
-        run_spin_cycle(&mut platform);
-        print_2d_matrix(&platform);        
-        
-        run_spin_cycle(&mut platform);
+
+        platform = run_spin_cycles(&platform, 1);
+        print_2d_matrix(&platform);
+
+        platform = run_spin_cycles(&platform, 1);
+        print_2d_matrix(&platform);
+
+        platform = run_spin_cycles(&platform, 10000);
         print_2d_matrix(&platform);
     }
 
