@@ -129,6 +129,7 @@ fn parse_line(line: &str) -> (&str, Vec<usize>) {
     (conditions, groups)
 }
 
+#[wasm_bindgen]
 pub fn day_12_sum_of_possible_arrangements(condition_records: &str) -> usize {
     let mut acc = 0;
     for line in condition_records.split("\n").map(|line| line.trim()) {
@@ -139,6 +140,7 @@ pub fn day_12_sum_of_possible_arrangements(condition_records: &str) -> usize {
     acc
 }
 
+#[wasm_bindgen]
 pub fn day_12_sum_of_possible_arrangements_part_2(condition_records: &str) -> usize {
     let mut acc = 0;
     for line in condition_records.split("\n").map(|line| line.trim()) {
