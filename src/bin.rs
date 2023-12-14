@@ -2,7 +2,8 @@ use std::env;
 use std::fs;
 
 use aoc_restore_snow_operations::{
-    day_1, day_10, day_11, day_12, day_13, day_2, day_3, day_4, day_5, day_6, day_7, day_8, day_9,
+    day_1, day_10, day_11, day_12, day_13, day_14, day_2, day_3, day_4, day_5, day_6, day_7, day_8,
+    day_9,
 };
 
 pub fn main() {
@@ -95,6 +96,12 @@ pub fn main() {
         13 => {
             println!("{}", day_13::day_13_summarize_notes(&contents));
             println!("{}", day_13::day_13_summarize_notes_part_2(&contents));
+        }
+        14 => {
+            println!(
+                "{}",
+                day_14::day_14_calcuate_total_load_on_north_support_beams(&contents)
+            );
         }
         _ => {
             println!("Day {} not implemented", day);

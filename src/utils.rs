@@ -15,4 +15,5 @@ pub fn print_2d_matrix(matrix: &Vec<Vec<char>>) {
     for row in matrix {
         println!("{}", row.iter().collect::<String>());
     }
+    println!();
 }
