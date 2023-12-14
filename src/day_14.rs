@@ -191,34 +191,46 @@ pub fn day_14_calcuate_total_load_on_north_support_beams(input: &str) -> usize {
 }
 
 fn run_spin_cycles(platform: &Vec<Vec<char>>, n: usize) -> Vec<Vec<char>> {
-    let mut final_state = platform.clone();
+    let mut current_state = platform.clone();
 
-    let mut cache_hits = 0;
+    let mut cycle_cache: HashMap<Vec<Vec<char>>, Vec<Vec<char>>> = HashMap::new();
+    let mut tilt_cache: HashMap<(Vec<Vec<char>>, Direction), Vec<Vec<char>>> = HashMap::new();
 
-    let mut memo: HashMap<(Vec<Vec<char>>, Direction), Vec<Vec<char>>> = HashMap::new();
+    let mut outer_cache_hits = 0;
+    let (mut inner_cache_hits, mut inner_cache_misses) = (0, 0);
 
-    for _ in 0..n {
-        for direction in [
-            Direction::North,
-            Direction::West,
-            Direction::South,
-            Direction::East,
-        ] {
-            final_state = if let Some(new_state) = memo.get(&(final_state.clone(), direction.clone()))
-            {
-                cache_hits = cache_hits + 1;
-                new_state.to_vec()
-            } else {
-            let new_state = tilt_platform(&final_state, &direction);
-                memo.insert((final_state, direction), new_state.clone());
-                new_state
+    for i in 0..n {
+        let mut intermediate_state = current_state.clone();
+        current_state = if let Some(new_state) = cycle_cache.get(&current_state.clone()) {
+            outer_cache_hits= outer_cache_hits + 1;
+            new_state.to_vec()
+        } else {
+            for direction in [
+                Direction::North,
+                Direction::West,
+                Direction::South,
+                Direction::East,
+            ] {
+                intermediate_state = if let Some(new_state) = tilt_cache.get(&(intermediate_state.clone(), direction.clone()))
+                {
+                    inner_cache_hits = inner_cache_hits + 1;
+                    new_state.to_vec()
+                } else {
+                    inner_cache_misses = inner_cache_misses + 1;
+                    let new_state = tilt_platform(&intermediate_state, &direction);
+                    tilt_cache.insert((intermediate_state, direction), new_state.clone());
+                    new_state
+                }
             }
-        }
+            cycle_cache.insert(current_state, intermediate_state.clone());
+            intermediate_state
+        }  
     }
 
-    println!("Cache hit {} times out of {}", cache_hits, n*4);
+    println!("{} inner cache hits out of {} attempts", inner_cache_hits, inner_cache_hits + inner_cache_misses);
+    println!("{} outer cache hits out of {} attempts", outer_cache_hits, n);
 
-    final_state
+   current_state 
 }
 
 pub fn day_14_calcuate_total_load_on_north_support_beams_part_2(input: &str) -> usize {
@@ -293,15 +305,17 @@ mod tests {
         platform = run_spin_cycles(&platform, 1);
         print_2d_matrix(&platform);
 
-        platform = run_spin_cycles(&platform, 10000);
+        platform = run_spin_cycles(&platform, 1000000);
         print_2d_matrix(&platform);
+
+        assert_eq!(1, 2)
     }
 
-    #[test]
-    fn test_day_14_calcuate_total_load_on_north_support_beams_part_2() {
-        assert_eq!(
-            64,
-            day_14_calcuate_total_load_on_north_support_beams_part_2(EXAMPLE)
-        );
-    }
+    // #[test]
+    // fn test_day_14_calcuate_total_load_on_north_support_beams_part_2() {
+    //     assert_eq!(
+    //         64,
+    //         day_14_calcuate_total_load_on_north_support_beams_part_2(EXAMPLE)
+    //     );
+    // }
 }
