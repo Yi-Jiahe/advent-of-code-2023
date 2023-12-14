@@ -114,12 +114,6 @@ pub fn day_13_summarize_notes(notes: &str) -> usize {
     acc
 }
 
-fn print_pattern(pattern: &Vec<Vec<char>>) {
-    for row in pattern {
-        println!("{}", row.iter().collect::<String>());
-    }
-}
-
 pub fn day_13_summarize_notes_part_2(notes: &str) -> usize {
     let mut acc = 0;
 
