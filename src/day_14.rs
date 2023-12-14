@@ -1,3 +1,12 @@
+use crate::utils::print_2d_matrix;
+
+enum Direction {
+    North,
+    South,
+    East,
+    West,
+}
+
 fn parse_input(input: &str) -> Vec<Vec<char>> {
     let mut platform = Vec::new();
 
@@ -16,37 +25,141 @@ fn parse_input(input: &str) -> Vec<Vec<char>> {
     platform
 }
 
-fn tilt_platform<'a>(platform: &'a mut Vec<Vec<char>>) -> &'a Vec<Vec<char>> {
+fn tilt_platform<'a>(platform: &'a mut Vec<Vec<char>>, direction: Direction) -> &'a Vec<Vec<char>> {
     let n = platform.len();
     let m = platform[0].len();
 
-    for j in 0..m {
-        let mut rounded_rocks = 0;
-        let mut last_anchor = 0;
-        for i in 0..n {
-            match platform[i][j] {
-                '.' => {}
-                'O' => {
-                    rounded_rocks = rounded_rocks + 1;
-                    platform[i][j] = '.'
+    match direction {
+        Direction::North => {
+            for j in 0..m {
+                let mut rounded_rocks = 0;
+                let mut last_anchor = 0;
+                for i in 0..n {
+                    match platform[i][j] {
+                        '.' => {}
+                        'O' => {
+                            rounded_rocks = rounded_rocks + 1;
+                            platform[i][j] = '.'
+                        }
+                        '#' => {
+                            // Roll rocks
+                            for x in last_anchor..(last_anchor + rounded_rocks) {
+                                platform[x][j] = 'O'
+                            }
+
+                            // Reset anchor variabes
+                            rounded_rocks = 0;
+                            last_anchor = i + 1;
+                        }
+                        _ => unreachable!(),
+                    }
                 }
-                '#' => {
-                    // Roll rocks
+
+                if rounded_rocks != 0 {
                     for x in last_anchor..(last_anchor + rounded_rocks) {
                         platform[x][j] = 'O'
                     }
-
-                    // Reset anchor variabes
-                    rounded_rocks = 0;
-                    last_anchor = i + 1;
                 }
-                _ => unreachable!(),
             }
         }
+        Direction::South => {
+            for j in 0..m {
+                let mut rounded_rocks = 0;
+                let mut last_anchor = n - 1;
+                for i in (0..n).rev() {
+                    match platform[i][j] {
+                        '.' => {}
+                        'O' => {
+                            rounded_rocks = rounded_rocks + 1;
+                            platform[i][j] = '.'
+                        }
+                        '#' => {
+                            // Roll rocks
+                            for x in (last_anchor - rounded_rocks + 1)..=last_anchor {
+                                platform[x][j] = 'O'
+                            }
 
-        if rounded_rocks != 0 {
-            for x in last_anchor..(last_anchor + rounded_rocks) {
-                platform[x][j] = 'O'
+                            // Reset anchor variabes
+                            rounded_rocks = 0;
+                            if i > 0 {
+                                last_anchor = i - 1;
+                            }
+                        }
+                        _ => unreachable!(),
+                    }
+                }
+
+                if rounded_rocks != 0 {
+                    for x in (last_anchor - rounded_rocks + 1)..=last_anchor {
+                        platform[x][j] = 'O'
+                    }
+                }
+            }
+        }
+        Direction::East => {
+            for i in 0..n {
+                let mut rounded_rocks = 0;
+                let mut last_anchor = m - 1;
+                for j in (0..m).rev() {
+                    match platform[i][j] {
+                        '.' => {}
+                        'O' => {
+                            rounded_rocks = rounded_rocks + 1;
+                            platform[i][j] = '.'
+                        }
+                        '#' => {
+                            // Roll rocks
+                            for y in (last_anchor - rounded_rocks + 1)..=last_anchor {
+                                platform[i][y] = 'O'
+                            }
+
+                            // Reset anchor variabes
+                            rounded_rocks = 0;
+                            if j > 0 {
+                                last_anchor = j - 1;
+                            }
+                        }
+                        _ => unreachable!(),
+                    }
+                }
+
+                if rounded_rocks != 0 {
+                    for y in (last_anchor - rounded_rocks + 1)..=last_anchor {
+                        platform[i][y] = 'O'
+                    }
+                }
+            }
+        }
+        Direction::West => {
+            for i in 0..n {
+                let mut rounded_rocks = 0;
+                let mut last_anchor = 0;
+                for j in 0..m {
+                    match platform[i][j] {
+                        '.' => {}
+                        'O' => {
+                            rounded_rocks = rounded_rocks + 1;
+                            platform[i][j] = '.'
+                        }
+                        '#' => {
+                            // Roll rocks
+                            for y in last_anchor..(last_anchor + rounded_rocks) {
+                                platform[i][y] = 'O'
+                            }
+
+                            // Reset anchor variabes
+                            rounded_rocks = 0;
+                            last_anchor = j + 1;
+                        }
+                        _ => unreachable!(),
+                    }
+                }
+
+                if rounded_rocks != 0 {
+                    for y in last_anchor..(last_anchor + rounded_rocks) {
+                        platform[i][y] = 'O'
+                    }
+                }
             }
         }
     }
@@ -57,7 +170,7 @@ fn tilt_platform<'a>(platform: &'a mut Vec<Vec<char>>) -> &'a Vec<Vec<char>> {
 pub fn day_14_calcuate_total_load_on_north_support_beams(input: &str) -> usize {
     let mut platform = parse_input(input);
 
-    tilt_platform(&mut platform);
+    tilt_platform(&mut platform, Direction::North);
 
     let mut acc = 0;
     let n = platform.len();
@@ -93,5 +206,25 @@ mod tests {
             136,
             day_14_calcuate_total_load_on_north_support_beams(EXAMPLE)
         );
+    }
+
+    #[test]
+    fn test_tilt() {
+        let platform = parse_input(EXAMPLE);
+        print_2d_matrix(&platform);
+
+        // let mut south_tilt = platform.clone();
+        // tilt_platform(&mut south_tilt, Direction::South);
+        // print_2d_matrix(&south_tilt);
+
+        // let mut west_tilt = platform.clone();
+        // tilt_platform(&mut west_tilt, Direction::West);
+        // print_2d_matrix(&west_tilt);
+
+        let mut east_tilt = platform.clone();
+        tilt_platform(&mut east_tilt, Direction::East);
+        print_2d_matrix(&east_tilt);
+
+        assert_eq!(1, 2);
     }
 }
