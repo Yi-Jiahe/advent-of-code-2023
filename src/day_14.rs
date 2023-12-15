@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use crate::utils::print_2d_matrix;
 
 use std::collections::HashMap;
