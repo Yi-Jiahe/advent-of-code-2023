@@ -266,12 +266,18 @@ fn run_spin_cycles(platform: &Vec<Vec<char>>, n: usize) -> Vec<Vec<char>> {
 
         let cycles_remaining = n - manual_cycles;
 
-        println!("Current cycle: {}, Remaining cycles: {}", manual_cycles, cycles_remaining);
+        println!(
+            "Current cycle: {}, Remaining cycles: {}",
+            manual_cycles, cycles_remaining
+        );
 
         let skipped_cycles = (cycles_remaining / large_cycle_length) * large_cycle_length;
         let next_manual_cycle = manual_cycles + skipped_cycles;
 
-        println!("Skipping ahead {} cycles to cycle {}", skipped_cycles, next_manual_cycle);
+        println!(
+            "Skipping ahead {} cycles to cycle {}",
+            skipped_cycles, next_manual_cycle
+        );
 
         for _ in next_manual_cycle..n {
             if let Some(new_state) = cycle_cache.get(&current_state.clone()) {
@@ -291,7 +297,8 @@ fn run_spin_cycles(platform: &Vec<Vec<char>>, n: usize) -> Vec<Vec<char>> {
     );
     println!(
         "{} outer cache hits out of {} attempts",
-        outer_cache_hits, outer_cache_hits + outer_cache_misses
+        outer_cache_hits,
+        outer_cache_hits + outer_cache_misses
     );
 
     current_state
