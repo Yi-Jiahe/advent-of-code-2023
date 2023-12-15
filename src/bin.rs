@@ -109,6 +109,10 @@ pub fn main() {
         }
         15 => {
             println!("{}", day_15::day_15_determine_verfication_number(&contents));
+            println!(
+                "{}",
+                day_15::day_15_determine_resultant_focusing_power(&contents)
+            );
         }
         _ => {
             println!("Day {} not implemented", day);
