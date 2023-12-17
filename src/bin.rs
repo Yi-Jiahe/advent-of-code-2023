@@ -120,6 +120,7 @@ pub fn main() {
         }
         17 => {
           println!("{}", day_17::day_17_find_lowest_heat_loss(&contents));
+          println!("{}", day_17::day_17_find_lowest_heat_loss_for_ultra_crucible(&contents));
       }
         _ => {
             println!("Day {} not implemented", day);

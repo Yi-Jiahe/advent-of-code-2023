@@ -143,6 +143,151 @@ pub fn day_17_find_lowest_heat_loss(input: &str) -> usize {
     ans
 }
 
+pub fn day_17_find_lowest_heat_loss_for_ultra_crucible(input: &str) -> usize {
+    let map = parse_2d_matrix(input);
+
+    let n = map.len();
+    let m = map[0].len();
+
+    let mut dp: Vec<Vec<Vec<[usize; 10]>>> = std::iter::repeat(
+        std::iter::repeat(std::iter::repeat([usize::MAX; 10]).take(4).collect())
+            .take(m)
+            .collect(),
+    )
+    .take(n)
+    .collect();
+
+    let mut stack = VecDeque::from([
+        ((1, 0), (Direction::Down, 1), 0),
+        ((0, 1), (Direction::Right, 1), 0),
+    ]);
+
+    loop {
+        if let Some(((i, j), (direction, consecutive_blocks), prev_heat_loss)) = stack.pop_front() {
+            let curr_heat_loss = prev_heat_loss + map[i][j].to_digit(10).unwrap() as usize;
+
+            // If the best state on the current block is better than the current state, don't bother processing the current state
+            if curr_heat_loss >= dp[i][j][direction as usize][consecutive_blocks - 1] {
+                continue;
+            }
+            dp[i][j][direction as usize][consecutive_blocks - 1] = curr_heat_loss;
+
+            let mut next = Vec::new();
+            match direction {
+                Direction::Up => {
+                    if consecutive_blocks >= 4 {
+                        next.push((
+                            move_2d((i, j), (0, -1), (n, m)),
+                            (Direction::Left, 1),
+                            curr_heat_loss,
+                        ));
+                        next.push((
+                            move_2d((i, j), (0, 1), (n, m)),
+                            (Direction::Right, 1),
+                            curr_heat_loss,
+                        ));
+                    }
+                    if consecutive_blocks < 10 {
+                        next.push((
+                            move_2d((i, j), (-1, 0), (n, m)),
+                            (Direction::Up, consecutive_blocks + 1),
+                            curr_heat_loss,
+                        ));
+                    }
+                }
+                Direction::Down => {
+                    if consecutive_blocks >= 4 {
+                                  next.push((
+                        move_2d((i, j), (0, -1), (n, m)),
+                        (Direction::Left, 1),
+                        curr_heat_loss,
+                    ));
+                    next.push((
+                        move_2d((i, j), (0, 1), (n, m)),
+                        (Direction::Right, 1),
+                        curr_heat_loss,
+                    ));
+                    }
+      
+                    if consecutive_blocks < 10 {
+                        next.push((
+                            move_2d((i, j), (1, 0), (n, m)),
+                            (Direction::Down, consecutive_blocks + 1),
+                            curr_heat_loss,
+                        ));
+                    }
+                }
+                Direction::Left => {
+                    if consecutive_blocks >= 4 {
+                                        next.push((
+                        move_2d((i, j), (-1, 0), (n, m)),
+                        (Direction::Up, 1),
+                        curr_heat_loss,
+                    ));
+                    next.push((
+                        move_2d((i, j), (1, 0), (n, m)),
+                        (Direction::Down, 1),
+                        curr_heat_loss,
+                    ));
+                    }
+
+                    if consecutive_blocks < 10 {
+                        next.push((
+                            move_2d((i, j), (0, -1), (n, m)),
+                            (Direction::Left, consecutive_blocks + 1),
+                            curr_heat_loss,
+                        ));
+                    }
+                }
+                Direction::Right => {
+                    if consecutive_blocks >= 4 {
+                                           next.push((
+                        move_2d((i, j), (-1, 0), (n, m)),
+                        (Direction::Up, 1),
+                        curr_heat_loss,
+                    ));
+                    next.push((
+                        move_2d((i, j), (1, 0), (n, m)),
+                        (Direction::Down, 1),
+                        curr_heat_loss,
+                    ));
+                    }
+ 
+                    if consecutive_blocks < 10 {
+                        next.push((
+                            move_2d((i, j), (0, 1), (n, m)),
+                            (Direction::Right, consecutive_blocks + 1),
+                            curr_heat_loss,
+                        ));
+                    }
+                }
+            }
+            for (result, (direction, consecutive_blocks), heat_loss) in next.iter() {
+                match result {
+                    Ok((next_i, next_j)) => stack.push_back((
+                        (*next_i, *next_j),
+                        (*direction, *consecutive_blocks),
+                        *heat_loss,
+                    )),
+                    Err(_) => continue,
+                }
+            }
+        } else {
+            break;
+        }
+    }
+
+    let mut ans = usize::MAX;
+    for heat_losses in &dp[n - 1][m - 1] {
+        for (i, heat_loss) in heat_losses.iter().enumerate() {
+            if i + 1 >= 4 {
+                ans = min(ans, *heat_loss);
+            }
+        }
+    }
+    ans
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -164,5 +309,15 @@ mod tests {
     #[test]
     fn test_day_17_find_lowest_heat_loss() {
         assert_eq!(102, day_17_find_lowest_heat_loss(EXAMPLE));
+    }
+
+    #[test]
+    fn test_day_17_find_lowest_heat_loss_for_ultra_crucible() {
+        assert_eq!(94, day_17_find_lowest_heat_loss_for_ultra_crucible(EXAMPLE));
+        assert_eq!(71, day_17_find_lowest_heat_loss_for_ultra_crucible(r#"111111111111
+        999999999991
+        999999999991
+        999999999991
+        999999999991"#));
     }
 }
