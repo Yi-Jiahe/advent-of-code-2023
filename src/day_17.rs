@@ -1,4 +1,4 @@
-use crate::utils::{move_2d, parse_2d_matrix, print_2d_matrix};
+use crate::utils::{move_2d, parse_2d_matrix};
 
 use std::cmp::min;
 use std::collections::VecDeque;
