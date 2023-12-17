@@ -1,5 +1,6 @@
 use crate::utils::{move_2d, parse_2d_matrix, print_2d_matrix};
 
+use std::cmp::max;
 use std::collections::{HashSet, VecDeque};
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash)]
@@ -10,15 +11,16 @@ enum Direction {
     Right,
 }
 
-pub fn day_16_count_energized_tiles(input: &str) -> usize {
-    let layout = parse_2d_matrix(input);
-
-    let n = layout.len();
-    let m = layout[0].len();
+fn count_energized_tiles(
+    layout: &Vec<Vec<char>>,
+    size: (usize, usize),
+    start_state: ((usize, usize), Direction),
+) -> usize {
+    let (n, m) = size;
 
     let mut energized_squares: HashSet<(usize, usize)> = HashSet::new();
     let mut explored_states: HashSet<((usize, usize), Direction)> = HashSet::new();
-    let mut next = VecDeque::from([((0, 0), Direction::Right)]);
+    let mut next = VecDeque::from([start_state]);
 
     loop {
         if let Some(((i, j), direction)) = next.pop_front() {
@@ -87,16 +89,52 @@ pub fn day_16_count_energized_tiles(input: &str) -> usize {
     energized_squares.len()
 }
 
+pub fn day_16_count_energized_tiles(input: &str) -> usize {
+    let layout = parse_2d_matrix(input);
+
+    let n = layout.len();
+    let m = layout[0].len();
+
+    count_energized_tiles(&layout, (n, m), ((0, 0), Direction::Right))
+}
+
+pub fn day_16_count_most_energized_tiles(input: &str) -> usize {
+    let layout = parse_2d_matrix(input);
+
+    let n = layout.len();
+    let m = layout[0].len();
+
+    let mut max_energized_tiles = 0;
+
+    for i in 0..n {
+        max_energized_tiles = max(
+            max_energized_tiles,
+            count_energized_tiles(&layout, (n, m), ((i, 0), Direction::Right)),
+        );
+        max_energized_tiles = max(
+            max_energized_tiles,
+            count_energized_tiles(&layout, (n, m), ((i, m - 1), Direction::Left)),
+        );
+    }
+    for j in 0..m {
+        max_energized_tiles = max(
+            max_energized_tiles,
+            count_energized_tiles(&layout, (n, m), ((0, j), Direction::Down)),
+        );
+        max_energized_tiles = max(
+            max_energized_tiles,
+            count_energized_tiles(&layout, (n, m), ((n - 1, j), Direction::Up)),
+        );
+    }
+
+    max_energized_tiles
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_16_count_energized_tiles() {
-        assert_eq!(
-            46,
-            day_16_count_energized_tiles(
-                r#".|...\....
+    const EXAMPLE: &str = r#".|...\....
     |.-.\.....
     .....|-...
     ........|.
@@ -105,8 +143,15 @@ mod tests {
     ..../.\\..
     .-.-/..|..
     .|....-|.\
-    ..//.|...."#
-            )
-        );
+    ..//.|...."#;
+
+    #[test]
+    fn test_day_16_count_energized_tiles() {
+        assert_eq!(46, day_16_count_energized_tiles(EXAMPLE));
+    }
+
+    #[test]
+    fn test_day_16_count_most_energized_tiles() {
+        assert_eq!(51, day_16_count_most_energized_tiles(EXAMPLE));
     }
 }

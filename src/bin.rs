@@ -116,6 +116,7 @@ pub fn main() {
         }
         16 => {
             println!("{}", day_16::day_16_count_energized_tiles(&contents));
+            println!("{}", day_16::day_16_count_most_energized_tiles(&contents));
         }
         _ => {
             println!("Day {} not implemented", day);
