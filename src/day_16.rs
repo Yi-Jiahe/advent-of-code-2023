@@ -16,8 +16,6 @@ pub fn day_16_count_energized_tiles(input: &str) -> usize {
     let n = layout.len();
     let m = layout[0].len();
 
-    print_2d_matrix(&layout);
-
     let mut energized_squares: HashSet<(usize, usize)> = HashSet::new();
     let mut explored_states: HashSet<((usize, usize), Direction)> = HashSet::new();
     let mut next = VecDeque::from([((0, 0), Direction::Right)]);
