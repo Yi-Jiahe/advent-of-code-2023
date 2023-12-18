@@ -1,7 +1,7 @@
 use crate::utils::print_2d_matrix;
 
 use std::cmp::{max, min};
-use std::collections::HashSet;
+use std::collections::{HashSet, VecDeque};
 
 fn parse_dig_plan(input: &str) -> Vec<(char, usize, String)> {
     let mut dig_plan = Vec::new();
@@ -24,6 +24,45 @@ fn parse_dig_plan(input: &str) -> Vec<(char, usize, String)> {
     }
 
     dig_plan
+}
+
+fn find_flood_fill_seed(bounds: [isize; 4], trench_set: &HashSet<[isize; 2]>) -> [isize; 2] {
+    'row_loop: for x in bounds[0]..=bounds[1] {
+        for y in bounds[2]..=bounds[3] {
+            // The first instance we hit the trench, check if its empty on the otherside. If so, its inside the lagoon
+            if trench_set.contains(&[x, y]) && !trench_set.contains(&[x, y + 1]) {
+                return [x, y + 1];
+            } else {
+                continue 'row_loop;
+            }
+        }
+    }
+
+    unreachable!();
+}
+
+fn count_interior(seed: [isize; 2], trench_set: &HashSet<[isize; 2]>) -> usize {
+    let mut filled: HashSet<[isize; 2]> = HashSet::new();
+    filled.extend(trench_set);
+
+    let mut stack = VecDeque::from([seed]);
+
+    loop {
+        if let Some([x, y]) = stack.pop_front() {
+            if filled.contains(&[x, y]) {
+                continue;
+            }
+            filled.insert([x, y]);
+            stack.push_back([x - 1, y]);
+            stack.push_back([x + 1, y]);
+            stack.push_back([x, y - 1]);
+            stack.push_back([x, y + 1]);
+        } else {
+            break;
+        }
+    }
+
+    filled.len()
 }
 
 pub fn day_18_find_lagoon_capacity(input: &str) -> usize {
@@ -65,16 +104,20 @@ pub fn day_18_find_lagoon_capacity(input: &str) -> usize {
             .take(n)
             .collect();
 
-    for [x, y] in trench_set {
+    for [x, y] in &trench_set {
         visualization[(x - bounds[0]) as usize][(y - bounds[2]) as usize] = '#';
-        if x == 0 && y == 0 {
+        if *x == 0 && *y == 0 {
             visualization[(x - bounds[0]) as usize][(y - bounds[2]) as usize] = '*';
         }
     }
 
     print_2d_matrix(&visualization);
 
-    0
+    let seed = find_flood_fill_seed(bounds, &trench_set);
+
+    dbg!(&seed);
+
+    count_interior(seed, &trench_set)
 }
 
 #[cfg(test)]
