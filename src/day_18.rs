@@ -120,6 +120,63 @@ pub fn day_18_find_lagoon_capacity(input: &str) -> usize {
     count_interior(seed, &trench_set)
 }
 
+pub fn day_18_find_lagoon_capacity_part_2(input: &str) -> usize {
+    let dig_plan = parse_dig_plan(input);
+
+    // [Top, Bottom, Left, Right]
+    let mut bounds = [0; 4];
+    let mut current = [0; 2];
+
+    let mut trench = Vec::new();
+    let mut trench_set: HashSet<[isize; 2]> = HashSet::from([current]);
+
+    for (_, _, colour) in dig_plan {
+        let 
+
+        for _ in 0..distance {
+            match direction {
+                'U' => current[0] = current[0] - 1,
+                'D' => current[0] = current[0] + 1,
+                'L' => current[1] = current[1] - 1,
+                'R' => current[1] = current[1] + 1,
+                _ => unreachable!(),
+            }
+
+            trench.push((current, colour.clone()));
+            trench_set.insert(current);
+
+            bounds[0] = min(bounds[0], current[0]);
+            bounds[1] = max(bounds[1], current[0]);
+            bounds[2] = min(bounds[2], current[1]);
+            bounds[3] = max(bounds[3], current[1]);
+        }
+    }
+
+    let (n, m) = (
+        (bounds[1] - bounds[0] + 1) as usize,
+        (bounds[3] - bounds[2] + 1) as usize,
+    );
+    let mut visualization: Vec<Vec<char>> =
+        std::iter::repeat(std::iter::repeat('.').take(m).collect())
+            .take(n)
+            .collect();
+
+    for [x, y] in &trench_set {
+        visualization[(x - bounds[0]) as usize][(y - bounds[2]) as usize] = '#';
+        if *x == 0 && *y == 0 {
+            visualization[(x - bounds[0]) as usize][(y - bounds[2]) as usize] = '*';
+        }
+    }
+
+    print_2d_matrix(&visualization);
+
+    let seed = find_flood_fill_seed(bounds, &trench_set);
+
+    dbg!(&seed);
+
+    count_interior(seed, &trench_set)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
