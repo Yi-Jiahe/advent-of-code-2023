@@ -1,13 +1,15 @@
 use crate::utils::print_2d_matrix;
 
+use std::cmp::{max, min};
 use std::collections::HashSet;
-use std::cmp::{min, max};
 
 fn parse_dig_plan(input: &str) -> Vec<(char, usize, String)> {
     let mut dig_plan = Vec::new();
 
     for line in input.split("\n").map(|line| line.trim()) {
-        if line == "" {continue;}
+        if line == "" {
+            continue;
+        }
 
         let mut line_iterator = line.split_whitespace();
         let direction = line_iterator.next().unwrap().parse::<char>().unwrap();
@@ -38,10 +40,10 @@ pub fn day_18_find_lagoon_capacity(input: &str) -> usize {
         for _ in 0..distance {
             match direction {
                 'U' => current[0] = current[0] - 1,
-                'D' =>current[0] = current[0] + 1,
+                'D' => current[0] = current[0] + 1,
                 'L' => current[1] = current[1] - 1,
                 'R' => current[1] = current[1] + 1,
-                _ => unreachable!()
+                _ => unreachable!(),
             }
 
             trench.push((current, colour.clone()));
@@ -54,21 +56,21 @@ pub fn day_18_find_lagoon_capacity(input: &str) -> usize {
         }
     }
 
-    let (n, m) = ((bounds[1]-bounds[0]+1) as usize, (bounds[3]-bounds[2]+1) as usize);
-    let mut visualization: Vec<Vec<char>> = std::iter::repeat(
-        std::iter::repeat('.')
-            .take(m)
-            .collect(),
-    )
-    .take(n)
-    .collect();
+    let (n, m) = (
+        (bounds[1] - bounds[0] + 1) as usize,
+        (bounds[3] - bounds[2] + 1) as usize,
+    );
+    let mut visualization: Vec<Vec<char>> =
+        std::iter::repeat(std::iter::repeat('.').take(m).collect())
+            .take(n)
+            .collect();
 
     for [x, y] in trench_set {
-        visualization[(x-bounds[0]) as usize][(y-bounds[2]) as usize] = '#';
+        visualization[(x - bounds[0]) as usize][(y - bounds[2]) as usize] = '#';
         if x == 0 && y == 0 {
-            visualization[(x-bounds[0]) as usize][(y-bounds[2]) as usize] = '*';
+            visualization[(x - bounds[0]) as usize][(y - bounds[2]) as usize] = '*';
         }
-    } 
+    }
 
     print_2d_matrix(&visualization);
 
@@ -81,7 +83,10 @@ mod tests {
 
     #[test]
     fn test_day_18_find_lagoon_capacity() {
-        assert_eq!(62, day_18_find_lagoon_capacity(r#"R 6 (#70c710)
+        assert_eq!(
+            62,
+            day_18_find_lagoon_capacity(
+                r#"R 6 (#70c710)
         D 5 (#0dc571)
         L 2 (#5713f0)
         D 2 (#d2c081)
@@ -94,7 +99,8 @@ mod tests {
         R 2 (#7807d2)
         U 3 (#a77fa3)
         L 2 (#015232)
-        U 2 (#7a21e3)"#));
+        U 2 (#7a21e3)"#
+            )
+        );
     }
 }
-

@@ -197,18 +197,18 @@ pub fn day_17_find_lowest_heat_loss_for_ultra_crucible(input: &str) -> usize {
                 }
                 Direction::Down => {
                     if consecutive_blocks >= 4 {
-                                  next.push((
-                        move_2d((i, j), (0, -1), (n, m)),
-                        (Direction::Left, 1),
-                        curr_heat_loss,
-                    ));
-                    next.push((
-                        move_2d((i, j), (0, 1), (n, m)),
-                        (Direction::Right, 1),
-                        curr_heat_loss,
-                    ));
+                        next.push((
+                            move_2d((i, j), (0, -1), (n, m)),
+                            (Direction::Left, 1),
+                            curr_heat_loss,
+                        ));
+                        next.push((
+                            move_2d((i, j), (0, 1), (n, m)),
+                            (Direction::Right, 1),
+                            curr_heat_loss,
+                        ));
                     }
-      
+
                     if consecutive_blocks < 10 {
                         next.push((
                             move_2d((i, j), (1, 0), (n, m)),
@@ -219,16 +219,16 @@ pub fn day_17_find_lowest_heat_loss_for_ultra_crucible(input: &str) -> usize {
                 }
                 Direction::Left => {
                     if consecutive_blocks >= 4 {
-                                        next.push((
-                        move_2d((i, j), (-1, 0), (n, m)),
-                        (Direction::Up, 1),
-                        curr_heat_loss,
-                    ));
-                    next.push((
-                        move_2d((i, j), (1, 0), (n, m)),
-                        (Direction::Down, 1),
-                        curr_heat_loss,
-                    ));
+                        next.push((
+                            move_2d((i, j), (-1, 0), (n, m)),
+                            (Direction::Up, 1),
+                            curr_heat_loss,
+                        ));
+                        next.push((
+                            move_2d((i, j), (1, 0), (n, m)),
+                            (Direction::Down, 1),
+                            curr_heat_loss,
+                        ));
                     }
 
                     if consecutive_blocks < 10 {
@@ -241,18 +241,18 @@ pub fn day_17_find_lowest_heat_loss_for_ultra_crucible(input: &str) -> usize {
                 }
                 Direction::Right => {
                     if consecutive_blocks >= 4 {
-                                           next.push((
-                        move_2d((i, j), (-1, 0), (n, m)),
-                        (Direction::Up, 1),
-                        curr_heat_loss,
-                    ));
-                    next.push((
-                        move_2d((i, j), (1, 0), (n, m)),
-                        (Direction::Down, 1),
-                        curr_heat_loss,
-                    ));
+                        next.push((
+                            move_2d((i, j), (-1, 0), (n, m)),
+                            (Direction::Up, 1),
+                            curr_heat_loss,
+                        ));
+                        next.push((
+                            move_2d((i, j), (1, 0), (n, m)),
+                            (Direction::Down, 1),
+                            curr_heat_loss,
+                        ));
                     }
- 
+
                     if consecutive_blocks < 10 {
                         next.push((
                             move_2d((i, j), (0, 1), (n, m)),
@@ -314,10 +314,15 @@ mod tests {
     #[test]
     fn test_day_17_find_lowest_heat_loss_for_ultra_crucible() {
         assert_eq!(94, day_17_find_lowest_heat_loss_for_ultra_crucible(EXAMPLE));
-        assert_eq!(71, day_17_find_lowest_heat_loss_for_ultra_crucible(r#"111111111111
+        assert_eq!(
+            71,
+            day_17_find_lowest_heat_loss_for_ultra_crucible(
+                r#"111111111111
         999999999991
         999999999991
         999999999991
-        999999999991"#));
+        999999999991"#
+            )
+        );
     }
 }
