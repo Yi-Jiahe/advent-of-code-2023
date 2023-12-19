@@ -176,6 +176,14 @@ pub fn input_has_cycle(input: &str) -> bool {
     has_cycle("in", HashSet::from([""]), &simplified_workflows)
 }
 
+fn invert_conditions((r, o, v): (char, char, usize)) -> (char, char, usize) {
+    match o {
+        '<' => return (r, '>', v - 1),
+        '>' => return (r, '<', v + 1),
+        _ => unreachable!(),
+    };
+}
+
 fn find_all_cases<'a>(workflows: &'a Workflows) -> Vec<(Vec<&'a str>, Vec<(char, char, usize)>)> {
     fn find_cases<'a>(
         curr: &'a str,
@@ -185,22 +193,27 @@ fn find_all_cases<'a>(workflows: &'a Workflows) -> Vec<(Vec<&'a str>, Vec<(char,
     ) -> Vec<(Vec<&'a str>, Vec<(char, char, usize)>)> {
         let mut new_path = path.clone();
         new_path.push(curr);
+
         if curr == "A" || curr == "R" {
-            println!("Path: {:?}, Conditions: {:?}", new_path, conditions);
+            // println!("Path: {:?}, Conditions: {:?}", new_path, conditions);
             return vec![(new_path, conditions)];
         }
+
         let mut accepted_conditions = Vec::new();
+
+        let mut leftover_conditions = conditions.clone();
 
         let workflow = workflows.get(curr).unwrap();
         for WorkflowRule(r, o, v, d) in &workflow.0 {
-            let mut new_conditions = conditions.clone();
+            let mut new_conditions = leftover_conditions.clone();
             new_conditions.push((*r, *o, *v));
+            leftover_conditions.push(invert_conditions((*r, *o, *v)));
             accepted_conditions.extend(find_cases(d, new_path.clone(), new_conditions, workflows));
         }
         accepted_conditions.extend(find_cases(
             workflow.1,
             new_path.clone(),
-            conditions.clone(),
+            leftover_conditions.clone(),
             workflows,
         ));
 
@@ -239,20 +252,6 @@ fn find_valid_space(conditions: [[usize; 2]; 4]) -> usize {
     acc
 }
 
-fn find_overlaps(a: [[usize; 2]; 4], b: [[usize; 2]; 4]) -> usize {
-    let mut acc = 1;
-
-    for i in 0..4 {
-        let (l, r) = (max(a[i][0], b[i][0]), min(a[i][1], b[i][1]));
-        if r <= l + 1 {
-            return 0;
-        }
-        acc = acc * ((r - l) - 1);
-    }
-
-    acc
-}
-
 pub fn day_19_number_of_combinations_of_accepted_ratings(input: &str) -> usize {
     let (workflows, _) = parse_input(input);
 
@@ -266,12 +265,8 @@ pub fn day_19_number_of_combinations_of_accepted_ratings(input: &str) -> usize {
 
     let mut acc: isize = 0;
     for i in 0..n {
-        println!("{:?}", accepted_conditions[i]);
+        // println!("{:?}", accepted_conditions[i]);
         acc = acc + find_valid_space(accepted_conditions[i]) as isize;
-        for j in (i + 1)..n {
-            println!("{}, {}", i, j);
-            // acc = acc - find_overlaps(accepted_conditions[i], accepted_conditions[j]) as isize;
-        }
     }
 
     acc as usize
