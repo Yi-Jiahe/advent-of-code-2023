@@ -1,6 +1,5 @@
 use regex::Regex;
 
-use std::cmp::{max, min};
 use std::collections::{HashMap, HashSet};
 
 type MachinePart = [usize; 4];
@@ -309,25 +308,6 @@ mod tests {
         assert_eq!(
             15320205000000,
             find_valid_space([[0, 1416], [0, 4001], [0, 2006], [0, 1351]])
-        );
-    }
-
-    #[test]
-    fn test_find_overlaps() {
-        assert_eq!(
-            0,
-            find_overlaps(
-                [[0, 1416], [0, 4001], [0, 2006], [0, 1351]],
-                [[2662, 4001], [0, 4001], [0, 2006], [0, 1351]]
-            )
-        );
-        // 1338 * 1910 * 2005 * 1350
-        assert_eq!(
-            6917316165000,
-            find_overlaps(
-                [[2662, 4001], [0, 4001], [0, 2006], [0, 1351]],
-                [[0, 4001], [2090, 4001], [0, 4001], [0, 1351]]
-            )
         );
     }
 
