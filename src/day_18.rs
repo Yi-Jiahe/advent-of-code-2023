@@ -171,7 +171,7 @@ pub fn day_18_find_lagoon_capacity_part_2(input: &str) -> usize {
     }
 
     println!("Dug trench");
- 
+
     let seed = find_flood_fill_seed(bounds, &trench_set);
 
     count_interior(seed, &trench_set)
