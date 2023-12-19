@@ -1,16 +1,18 @@
 use regex::Regex;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet, VecDeque};
 
 type MachinePart = [usize; 4];
+
+type Workflows<'a> = HashMap<&'a str, (Vec<WorkflowRule<'a>>, &'a str)>;
 
 #[derive(Debug)]
 struct WorkflowRule<'a>(char, char, usize, &'a str);
 
-fn parse_input(input: &str) -> (HashMap<&str, (Vec<WorkflowRule>, &str)>, Vec<MachinePart>) {
+fn parse_input(input: &str) -> (Workflows, Vec<MachinePart>) {
     let mut input_iterator = input.split("\n").map(|line| line.trim());
 
-    let mut workflows: HashMap<&str, (Vec<WorkflowRule>, &str)> = HashMap::new();
+    let mut workflows: Workflows = HashMap::new();
 
     let workflow_re = Regex::new(r"(\w+)\{(.*),(\w+)\}").unwrap();
     let rule_re = Regex::new(r"(\w+)([><])(\d+):(\w+)").unwrap();
@@ -87,10 +89,7 @@ fn run_workflow<'a>(workflow: &'a (Vec<WorkflowRule>, &str), part: &MachinePart)
     return workflow.1;
 }
 
-fn sort_part<'a>(
-    part: &MachinePart,
-    workflows: &'a HashMap<&str, (Vec<WorkflowRule>, &str)>,
-) -> &'a str {
+fn sort_part<'a>(part: &MachinePart, workflows: &'a Workflows) -> &'a str {
     let mut workflow_name = "in";
 
     loop {
@@ -105,7 +104,7 @@ fn sort_part<'a>(
 }
 
 fn sort_parts<'a>(
-    workflows: &HashMap<&str, (Vec<WorkflowRule>, &str)>,
+    workflows: &Workflows,
     parts: &'a Vec<MachinePart>,
 ) -> (Vec<&'a MachinePart>, Vec<&'a MachinePart>) {
     let (mut accepted, mut rejected) = (Vec::new(), Vec::new());
@@ -136,16 +135,51 @@ pub fn day_19_sum_accepted_part_ratings(input: &str) -> usize {
     acc
 }
 
+pub fn input_has_cycle(input: &str) -> bool {
+    let (workflows, _) = parse_input(input);
+
+    let mut simplified_workflows = HashMap::new();
+
+    for (name, (rules, dump)) in workflows {
+        let mut destinations = HashSet::from([dump]);
+        for WorkflowRule(_, _, _, destination) in rules {
+            destinations.insert(destination);
+        }
+        simplified_workflows.insert(name, destinations);
+    }
+
+    fn has_cycle(
+        curr: &str,
+        visited: HashSet<&str>,
+        simplified_workflows: &HashMap<&str, HashSet<&str>>,
+    ) -> bool {
+        if curr == "A" || curr == "R" {
+            return false;
+        }
+
+        if visited.contains(curr) {
+            return true;
+        }
+
+        for adjacent_node in simplified_workflows.get(curr).unwrap() {
+            let mut visited_new = HashSet::from([curr]);
+            visited_new.extend(&visited);
+            if has_cycle(adjacent_node, visited_new, simplified_workflows) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    has_cycle("in", HashSet::from([""]), &simplified_workflows)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_day_19_sum_accepted_part_ratings() {
-        assert_eq!(
-            19114,
-            day_19_sum_accepted_part_ratings(
-                r#"px{a<2006:qkq,m>2090:A,rfg}
+    const EXAMPLE: &str = r#"px{a<2006:qkq,m>2090:A,rfg}
   pv{a>1716:R,A}
   lnx{m>1548:A,A}
   rfg{s<537:gd,x>2440:R,A}
@@ -161,8 +195,15 @@ mod tests {
   {x=1679,m=44,a=2067,s=496}
   {x=2036,m=264,a=79,s=2244}
   {x=2461,m=1339,a=466,s=291}
-  {x=2127,m=1623,a=2188,s=1013}"#
-            )
-        )
+  {x=2127,m=1623,a=2188,s=1013}"#;
+
+    #[test]
+    fn test_day_19_sum_accepted_part_ratings() {
+        assert_eq!(19114, day_19_sum_accepted_part_ratings(EXAMPLE))
+    }
+
+    #[test]
+    fn test_for_cycles() {
+        assert_eq!(false, input_has_cycle(EXAMPLE));
     }
 }

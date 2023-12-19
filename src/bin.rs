@@ -130,6 +130,10 @@ pub fn main() {
         }
         19 => {
             println!("{}", day_19::day_19_sum_accepted_part_ratings(&contents));
+            println!(
+                "Cycle found in input: {}",
+                day_19::input_has_cycle(&contents)
+            );
         }
         _ => {
             println!("Day {} not implemented", day);
