@@ -13,6 +13,12 @@ struct FlipFlop {
     state: bool,
 }
 
+impl FlipFlop {
+    fn new() -> FlipFlop {
+        FlipFlop { state: OFF }
+    }
+}
+
 impl Module for FlipFlop {
     fn receive(&mut self, _sender: &str, pulse: bool) -> Option<bool> {
         // If a flip-flop module receives a high pulse, it is ignored and nothing happens.
@@ -55,13 +61,68 @@ impl Module for Conjunction {
         Some(LOW)
     }
 }
+
+fn parse_module_configuration(
+    input: &str,
+) -> (
+    HashMap<String, Box<dyn Module>>,
+    HashMap<String, Vec<String>>,
+) {
+    let mut modules: HashMap<String, Box<dyn Module>> = HashMap::new();
+    let mut configuration: HashMap<String, Vec<String>> = HashMap::new();
+
+    for line in input.split("\n").map(|line| line.trim()) {
+        let mut parts = line.split("->").map(|part| part.trim());
+
+        let current_module = parts.next().unwrap();
+
+        let (module_type, module_name) = if current_module == "broadcaster" {
+            (None, String::from("broadcaster"))
+        } else {
+            (
+                Some(&current_module[0..1]),
+                (&current_module[1..]).to_string(),
+            )
+        };
+
+        if let Some(module_type) = module_type {
+            modules.insert(
+                module_name.clone(),
+                match module_type {
+                    "%" => Box::new(FlipFlop::new()),
+                    "&" => Box::new(Conjunction::new()),
+                    _ => unreachable!(),
+                },
+            );
+        }
+
+        let destination_modules = parts.next().unwrap();
+
+        configuration.insert(
+            module_name,
+            destination_modules
+                .split(',')
+                .map(|name| name.trim().to_string())
+                .collect::<Vec<String>>(),
+        );
+    }
+
+    (modules, configuration)
+}
+
+pub fn day_20_count_pulses(input: &str) {
+    let (modules, configuration) = parse_module_configuration(input);
+
+    // TODO: Implement
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_flip_flop() {
-        let mut flip_flop = FlipFlop { state: OFF };
+        let mut flip_flop = FlipFlop::new();
 
         // If a flip-flop module receives a high pulse, it is ignored and nothing happens.
         assert_eq!(None, flip_flop.receive("sender", HIGH));
