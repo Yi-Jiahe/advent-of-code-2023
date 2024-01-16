@@ -137,6 +137,7 @@ pub fn main() {
         }
         20 => {
             println!("{}", day_20::day_20_count_pulses(&contents));
+            println!("{}", day_20::day_20_count_button_presses(&contents));
         }
         _ => {
             println!("Day {} not implemented", day);

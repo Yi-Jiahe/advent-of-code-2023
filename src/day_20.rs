@@ -177,6 +177,44 @@ pub fn day_20_count_pulses(input: &str) -> usize {
     low_count * high_count
 }
 
+pub fn day_20_count_button_presses(input: &str) -> usize {
+    let (mut modules, configuration) = parse_module_configuration(input);
+
+    let mut button_presses = 0;
+
+    loop {
+        button_presses = button_presses + 1;
+
+        let mut stack = VecDeque::new();
+
+        for module in configuration
+            .get("broadcaster")
+            .expect("Broadcaster not found")
+        {
+            // Not going to check the pulse from the broadcaster because rx isn't connected to it
+            stack.push_back((module, "broadcaster", LOW));
+        }
+
+        while !stack.is_empty() {
+            let (current_module_name, sender, input_pulse) = stack.pop_front().unwrap();
+
+            if let Some(module) = modules.get_mut(current_module_name) {
+                if let Some(pulse) = module.receive(sender, input_pulse) {
+                    for destination_module in configuration
+                        .get(current_module_name)
+                        .expect(&format!("{} not found", current_module_name))
+                    {
+                        if pulse == LOW && destination_module == "rx" {
+                            return button_presses;
+                        }
+                        stack.push_back((destination_module, current_module_name, pulse));
+                    }
+                };
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

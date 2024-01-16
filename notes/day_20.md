@@ -1,0 +1,1 @@
+I imagine part 2 is going to need some form of memotization to jump between known states to speed up the simulation.
