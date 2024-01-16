@@ -40,12 +40,13 @@ struct Conjunction {
     memory: HashMap<String, bool>,
 }
 
-// TODO: Conjunction modules need to know their inputs at time of creation, not when it receives a pulse from the input
 impl Conjunction {
-    fn new() -> Conjunction {
-        Conjunction {
-            memory: HashMap::new(),
+    fn new(inputs: Vec<String>) -> Conjunction {
+        let mut memory = HashMap::new();
+        for input in inputs {
+            memory.insert(input, LOW);
         }
+        Conjunction { memory: memory }
     }
 }
 
@@ -73,6 +74,9 @@ fn parse_module_configuration(
     let mut modules: HashMap<String, Box<dyn Module>> = HashMap::new();
     let mut configuration: HashMap<String, Vec<String>> = HashMap::new();
 
+    let mut input_configuration: HashMap<String, Vec<String>> = HashMap::new();
+    let mut conjunctions: Vec<String> = Vec::new();
+
     for line in input.split("\n").map(|line| line.trim()) {
         let mut parts = line.split("->").map(|part| part.trim());
 
@@ -88,24 +92,44 @@ fn parse_module_configuration(
         };
 
         if let Some(module_type) = module_type {
-            modules.insert(
-                module_name.clone(),
-                match module_type {
-                    "%" => Box::new(FlipFlop::new()),
-                    "&" => Box::new(Conjunction::new()),
-                    _ => unreachable!(),
-                },
-            );
+            match module_type {
+                "%" => {
+                    modules.insert(module_name.clone(), Box::new(FlipFlop::new()));
+                    ()
+                }
+                "&" => conjunctions.push(module_name.clone()),
+                _ => unreachable!(),
+            }
         }
 
-        let destination_modules = parts.next().unwrap();
+        let destination_modules = parts
+            .next()
+            .unwrap()
+            .split(',')
+            .map(|name| name.trim().to_string())
+            .collect::<Vec<String>>();
 
-        configuration.insert(
-            module_name,
-            destination_modules
-                .split(',')
-                .map(|name| name.trim().to_string())
-                .collect::<Vec<String>>(),
+        for destination_module in &destination_modules {
+            if let Some(input_modules) = input_configuration.get(destination_module) {
+                let mut new_input_modules = input_modules.clone();
+                new_input_modules.push(module_name.clone());
+                input_configuration
+                    .insert(destination_module.to_string(), new_input_modules.to_vec());
+            } else {
+                input_configuration
+                    .insert(destination_module.to_string(), vec![module_name.clone()]);
+            }
+        }
+
+        configuration.insert(module_name, destination_modules);
+    }
+
+    for conjunction in conjunctions {
+        modules.insert(
+            conjunction.clone(),
+            Box::new(Conjunction::new(
+                input_configuration.get(&conjunction).unwrap().to_vec(),
+            )),
         );
     }
 
@@ -114,11 +138,8 @@ fn parse_module_configuration(
 
 pub fn day_20_count_pulses(input: &str) -> usize {
     let (mut modules, configuration) = parse_module_configuration(input);
-    
-    let mut count = HashMap::from([
-        (LOW, 0),
-        (HIGH, 0)
-    ]);
+
+    let mut count = HashMap::from([(LOW, 0), (HIGH, 0)]);
 
     for _ in 0..1000 {
         let mut stack = VecDeque::new();
@@ -126,26 +147,28 @@ pub fn day_20_count_pulses(input: &str) -> usize {
         // Button to broadcaster
         count.insert(LOW, count.get(&LOW).unwrap() + 1);
 
-        for module in configuration.get("broadcaster").expect("Broadcaster not found") {
+        for module in configuration
+            .get("broadcaster")
+            .expect("Broadcaster not found")
+        {
             count.insert(LOW, count.get(&LOW).unwrap() + 1);
             stack.push_back((module, "broadcaster", LOW));
-        }    
+        }
 
         while !stack.is_empty() {
             let (current_module_name, sender, input_pulse) = stack.pop_front().unwrap();
 
-            if current_module_name == "output" {
-                continue;
+            if let Some(module) = modules.get_mut(current_module_name) {
+                if let Some(pulse) = module.receive(sender, input_pulse) {
+                    for destination_module in configuration
+                        .get(current_module_name)
+                        .expect(&format!("{} not found", current_module_name))
+                    {
+                        count.insert(pulse, count.get(&pulse).unwrap() + 1);
+                        stack.push_back((destination_module, current_module_name, pulse));
+                    }
+                };
             }
-
-            let module: &mut Box<dyn Module> = modules.get_mut(current_module_name).expect(&format!("{} not found", current_module_name));
-
-            if let Some(pulse) = module.receive(sender, input_pulse) {
-                for destination_module in configuration.get(current_module_name).expect(&format!("{} not found", current_module_name)) {
-                    count.insert(pulse, count.get(&pulse).unwrap() + 1);
-                    stack.push_back((destination_module, current_module_name, pulse));
-                }
-            };
         }
     }
 
@@ -180,7 +203,7 @@ mod tests {
 
     #[test]
     fn test_conjunction() {
-        let mut inv = Conjunction::new();
+        let mut inv = Conjunction::new(vec![String::from("a")]);
 
         assert_eq!(Some(LOW), inv.receive("a", HIGH));
         assert_eq!(1, inv.memory.len());
@@ -189,16 +212,26 @@ mod tests {
 
     #[test]
     fn test_part_1() {
-        assert_eq!(32000000, day_20_count_pulses(r#"broadcaster -> a, b, c
+        assert_eq!(
+            32000000,
+            day_20_count_pulses(
+                r#"broadcaster -> a, b, c
         %a -> b
         %b -> c
         %c -> inv
-        &inv -> a"#));
+        &inv -> a"#
+            )
+        );
 
-        assert_eq!(11687500, day_20_count_pulses(r#"broadcaster -> a
+        assert_eq!(
+            11687500,
+            day_20_count_pulses(
+                r#"broadcaster -> a
         %a -> inv, con
         &inv -> b
         %b -> con
-        &con -> output"#));
+        &con -> output"#
+            )
+        );
     }
 }
