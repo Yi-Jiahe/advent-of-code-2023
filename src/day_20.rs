@@ -1,7 +1,8 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 
 const HIGH: bool = true;
 const LOW: bool = false;
+#[allow(dead_code)]
 const ON: bool = true;
 const OFF: bool = false;
 
@@ -39,6 +40,7 @@ struct Conjunction {
     memory: HashMap<String, bool>,
 }
 
+// TODO: Conjunction modules need to know their inputs at time of creation, not when it receives a pulse from the input
 impl Conjunction {
     fn new() -> Conjunction {
         Conjunction {
@@ -110,10 +112,46 @@ fn parse_module_configuration(
     (modules, configuration)
 }
 
-pub fn day_20_count_pulses(input: &str) {
-    let (modules, configuration) = parse_module_configuration(input);
+pub fn day_20_count_pulses(input: &str) -> usize {
+    let (mut modules, configuration) = parse_module_configuration(input);
+    
+    let mut count = HashMap::from([
+        (LOW, 0),
+        (HIGH, 0)
+    ]);
 
-    // TODO: Implement
+    for _ in 0..1000 {
+        let mut stack = VecDeque::new();
+
+        // Button to broadcaster
+        count.insert(LOW, count.get(&LOW).unwrap() + 1);
+
+        for module in configuration.get("broadcaster").expect("Broadcaster not found") {
+            count.insert(LOW, count.get(&LOW).unwrap() + 1);
+            stack.push_back((module, "broadcaster", LOW));
+        }    
+
+        while !stack.is_empty() {
+            let (current_module_name, sender, input_pulse) = stack.pop_front().unwrap();
+
+            if current_module_name == "output" {
+                continue;
+            }
+
+            let module: &mut Box<dyn Module> = modules.get_mut(current_module_name).expect(&format!("{} not found", current_module_name));
+
+            if let Some(pulse) = module.receive(sender, input_pulse) {
+                for destination_module in configuration.get(current_module_name).expect(&format!("{} not found", current_module_name)) {
+                    count.insert(pulse, count.get(&pulse).unwrap() + 1);
+                    stack.push_back((destination_module, current_module_name, pulse));
+                }
+            };
+        }
+    }
+
+    let (low_count, high_count) = (count.get(&LOW).unwrap(), count.get(&HIGH).unwrap());
+    println!("LOW: {}, HIGH: {}", low_count, high_count);
+    low_count * high_count
 }
 
 #[cfg(test)]
@@ -147,5 +185,20 @@ mod tests {
         assert_eq!(Some(LOW), inv.receive("a", HIGH));
         assert_eq!(1, inv.memory.len());
         assert_eq!(Some(&HIGH), inv.memory.get("a"));
+    }
+
+    #[test]
+    fn test_part_1() {
+        assert_eq!(32000000, day_20_count_pulses(r#"broadcaster -> a, b, c
+        %a -> b
+        %b -> c
+        %c -> inv
+        &inv -> a"#));
+
+        assert_eq!(11687500, day_20_count_pulses(r#"broadcaster -> a
+        %a -> inv, con
+        &inv -> b
+        %b -> con
+        &con -> output"#));
     }
 }
