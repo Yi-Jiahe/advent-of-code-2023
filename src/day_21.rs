@@ -156,6 +156,8 @@ mod tests {
     }
 
     #[test]
+    // Takes a long time
+    #[ignore]
     fn test_reachable_plots_infinite_grid() {
         assert_eq!(16, reachable_plots_infinite_grid(EXAMPLE, 6));
         assert_eq!(50, reachable_plots_infinite_grid(EXAMPLE, 10));

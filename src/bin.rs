@@ -141,6 +141,7 @@ pub fn main() {
         }
         21 => {
             println!("{}", day_21::day_21_part_1(&contents));
+            println!("{}", day_21::day_21_part_2(&contents));
         }
         _ => {
             println!("Day {} not implemented", day);
