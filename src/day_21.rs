@@ -107,10 +107,7 @@ fn reachable_plots_infinite_grid(input: &str, steps: usize) -> usize {
             ];
 
             for adjacent_position in adjacent_positions {
-                if map[modulo(adjacent_position.0, n)]
-                    [modulo(adjacent_position.1, m)]
-                    == '#'
-                {
+                if map[modulo(adjacent_position.0, n)][modulo(adjacent_position.1, m)] == '#' {
                     continue;
                 }
 
