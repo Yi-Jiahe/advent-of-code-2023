@@ -1,0 +1,3 @@
+The problem is made up of two parts. The first is to determine how the blocks would settle since we are given a snapshot of them in the air. The second is to determine what a block is being supported by; it has multiple supports, it means one of them might be able to be removed (contingent on if its supporting anything else).
+
+For the first part, we can sort the bricks from the bottom up and figure out where they will land in order. The order for bricks with the bottom block on the same level shouldn't matter because they shouldn't be able to block each other, being straight lines.
